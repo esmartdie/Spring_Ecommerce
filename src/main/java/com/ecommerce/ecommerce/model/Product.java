@@ -1,17 +1,23 @@
 package com.ecommerce.ecommerce.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "products")
 public class Product {
 
     public Product() {
     }
 
-    public Product(Integer id, String name, String description, String image, double price, int quantity) {
+    public Product(Integer id, String name, String description, String image,
+                   double price, int quantity, User user) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.image = image;
         this.price = price;
         this.quantity = quantity;
+        this.user = user;
     }
 
     @Override
@@ -74,11 +80,23 @@ public class Product {
         this.quantity = quantity;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
     private String description;
     private String image;
     private double price;
     private int quantity;
+    @ManyToOne
+    private User user;
 
 }

@@ -1,11 +1,15 @@
 package com.ecommerce.ecommerce.model;
 
-public class OrderDetails {
+import jakarta.persistence.*;
 
-    public OrderDetails() {
+@Entity
+@Table(name = "details")
+public class OrderDetail {
+
+    public OrderDetail() {
     }
 
-    public OrderDetails(Integer id, String name, double quantity, double price, double total) {
+    public OrderDetail(Integer id, String name, double quantity, double price, double total) {
         this.id = id;
         this.name = name;
         this.quantity = quantity;
@@ -53,6 +57,22 @@ public class OrderDetails {
         this.total = total;
     }
 
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
     @Override
     public String toString() {
         return "OrderDetails{" +
@@ -64,11 +84,16 @@ public class OrderDetails {
                 '}';
     }
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
     private double quantity;
     private double price;
     private double total;
-
+    @OneToOne
+    private Order order;
+    @ManyToOne
+    private Product product;
 
 }

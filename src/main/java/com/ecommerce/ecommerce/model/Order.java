@@ -1,7 +1,11 @@
 package com.ecommerce.ecommerce.model;
 
+import jakarta.persistence.*;
+
 import java.util.Date;
 
+@Entity
+@Table(name = "orders")
 public class Order {
 
     public Order() {
@@ -55,6 +59,22 @@ public class Order {
         this.total = total;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public OrderDetail getDetails() {
+        return details;
+    }
+
+    public void setDetails(OrderDetail details) {
+        this.details = details;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
@@ -66,9 +86,16 @@ public class Order {
                 '}';
     }
 
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String number;
     private Date creationDate;
     private Date receptionDate;
     private double total;
+    @ManyToOne
+    private User user;
+    @OneToOne (mappedBy = "order")
+    private OrderDetail details;
 }
