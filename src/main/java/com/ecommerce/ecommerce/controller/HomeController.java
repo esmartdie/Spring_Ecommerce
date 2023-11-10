@@ -112,6 +112,12 @@ public class HomeController {
         return "/user/cart";
     }
 
+    @GetMapping("/order")
+    public String order(){
+
+        return "user/ordersummary";
+    }
+
     @Autowired
     private ProductService productService;
     private final Logger LOG = LoggerFactory.getLogger(HomeController.class);
