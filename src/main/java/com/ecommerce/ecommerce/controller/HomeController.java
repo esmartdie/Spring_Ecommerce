@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.stream;
 
@@ -30,7 +31,7 @@ public class HomeController {
     @GetMapping("")
     public String home(Model model){
 
-        model.addAttribute("products", IProductService.findAll());
+        model.addAttribute("products", productService.findAll());
 
         return "/user/home";
     }
@@ -40,7 +41,7 @@ public class HomeController {
         LOG.info("Product Id sent as argument {}", id);
 
         Product product = new Product();
-        Optional<Product> optionalProduct = IProductService.getProduct(id);
+        Optional<Product> optionalProduct = productService.getProduct(id);
         product = optionalProduct.get();
 
         model.addAttribute("product", product);
@@ -53,7 +54,7 @@ public class HomeController {
         OrderDetail orderDetail = new OrderDetail();
         Product product = new Product();
         double totalSum = 0;
-        Optional<Product> optionalProduct = IProductService.getProduct(id);
+        Optional<Product> optionalProduct = productService.getProduct(id);
 
         LOG.info("Product added: {}", optionalProduct.get());
         LOG.info("Quantity: {}", quantity);
@@ -151,8 +152,19 @@ public class HomeController {
         return "redirect:/";
     }
 
+    @PostMapping("/search")
+    public String searchProduct(@RequestParam String productName, Model model){
+        LOG.info("Product name: {}", productName);
+
+        List<Product> products = productService.findAll().stream()
+                .filter(p -> p.getName().toLowerCase().contains(productName.toLowerCase())).collect(Collectors.toList());
+
+        model.addAttribute("products", products);
+        return"user/home";
+    }
+
     @Autowired
-    private IProductService IProductService;
+    private IProductService productService;
     private final Logger LOG = LoggerFactory.getLogger(HomeController.class);
     List<OrderDetail> details = new ArrayList<OrderDetail>();
 
