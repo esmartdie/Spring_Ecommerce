@@ -117,6 +117,7 @@ public class User {
     private String email;
     private String address;
     private String telephone;
+    @Column(name="userrol")
     private String userRol;
     private String password;
     @OneToMany(mappedBy = "user")

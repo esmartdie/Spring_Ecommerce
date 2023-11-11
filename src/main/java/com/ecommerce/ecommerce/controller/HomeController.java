@@ -3,8 +3,9 @@ package com.ecommerce.ecommerce.controller;
 import com.ecommerce.ecommerce.model.Order;
 import com.ecommerce.ecommerce.model.OrderDetail;
 import com.ecommerce.ecommerce.model.Product;
-import com.ecommerce.ecommerce.service.ProductService;
-import org.apache.coyote.Request;
+import com.ecommerce.ecommerce.model.User;
+import com.ecommerce.ecommerce.service.IProductService;
+import com.ecommerce.ecommerce.service.IUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class HomeController {
     @GetMapping("")
     public String home(Model model){
 
-        model.addAttribute("products", productService.findAll());
+        model.addAttribute("products", IProductService.findAll());
 
         return "/user/home";
     }
@@ -36,7 +37,7 @@ public class HomeController {
         LOG.info("Product Id sent as argument {}", id);
 
         Product product = new Product();
-        Optional<Product> optionalProduct = productService.getProduct(id);
+        Optional<Product> optionalProduct = IProductService.getProduct(id);
         product = optionalProduct.get();
 
         model.addAttribute("product", product);
@@ -49,7 +50,7 @@ public class HomeController {
         OrderDetail orderDetail = new OrderDetail();
         Product product = new Product();
         double totalSum = 0;
-        Optional<Product> optionalProduct = productService.getProduct(id);
+        Optional<Product> optionalProduct = IProductService.getProduct(id);
 
         LOG.info("Product added: {}", optionalProduct.get());
         LOG.info("Quantity: {}", quantity);
@@ -113,15 +114,24 @@ public class HomeController {
     }
 
     @GetMapping("/order")
-    public String order(){
+    public String order(Model model){
+
+        User user = userService.findById(2).get();
+
+        model.addAttribute("cart", details);
+        model.addAttribute("order", order);
+        model.addAttribute("user", user);
 
         return "user/ordersummary";
     }
 
     @Autowired
-    private ProductService productService;
+    private IProductService IProductService;
     private final Logger LOG = LoggerFactory.getLogger(HomeController.class);
     List<OrderDetail> details = new ArrayList<OrderDetail>();
+
     Order order = new Order();
+    @Autowired
+    private IUserService userService;
 
 }

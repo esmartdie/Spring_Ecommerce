@@ -45,11 +45,11 @@
                 <div class="col-lg-9">
                     <div class="card-body">
                         <h5 class="card-title">
-                            DATOS ORDEN
+                            ORDER DETAILS
                         </h5>
-                        <h6>Nombre: </h6>
-                        <h6>Correo: </h6>
-                        <h6>Dirección</h6>
+                        <h6 th:text="'Name: ' + ${user.name}"></h6>
+                        <h6 th:text="'Email: ' + ${user.email}"></h6>
+                        <h6 th:text="'Address: ' + ${user.address}"></h6>
 
                         <h5 class="card-title">
                             PRODUCTOS
@@ -58,18 +58,18 @@
                             <table class="table">
                                 <thead>
                                 <tr>
-                                    <th scope="col">Producto</th>
-                                    <th scope="col">Precio</th>
-                                    <th scope="col">Cantidad</th>
+                                    <th scope="col">Product</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Quantity</th>
                                     <th scope="col">Total</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td>Nombre</td>
-                                    <td>Precio</td>
-                                    <td>Cantidad</td>
-                                    <td>Total</td>
+                                <tr th:each="dtorder:${cart}">
+                                    <td th:text="${dtorder.name}"></td>
+                                    <td th:text="${dtorder.price}"></td>
+                                    <td th:text="${dtorder.quantity}"></td>
+                                    <td th:text="${dtorder.total}"></td>
 
                                 </tr>
                                 </tbody>
@@ -81,24 +81,25 @@
 
 
                 <div class="col-lg-3">
-                    <h2 class="card-title">Resumen Orden</h2>
+                    <h2 class="card-title">Order summary</h2>
 
                     <ul class="list-group">
-                        <li class="list-group-item"><h5> Total:</h5></li>
-                        <a href="#" class="btn btn-dark">Generar</a>
+                        <li class="list-group-item"><h5 th:text=" 'Total: ' + ${order.total}"> Total:</h5></li>
+                        <a href="#" class="btn btn-dark">Generate</a>
                     </ul>
                 </div>
             </div>
         </div>
     </div>
     <!-- /.container -->
+</div>
 
-    <!-- Footer -->
-    <div th:insert=~{user/template_user.html::footer}></div>
+<!-- Footer -->
+<div th:insert=~{user/template_user.html::footer}></div>
 
-    <!-- Bootstrap core JavaScript -->
-    <script th:src="@{/vendor/jquery/jquery.min.js}"></script>
-    <script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<!-- Bootstrap core JavaScript -->
+<script th:src="@{/vendor/jquery/jquery.min.js}"></script>
+<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
 
 </body>
 
