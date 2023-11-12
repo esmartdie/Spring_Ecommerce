@@ -31,6 +31,13 @@ public class OrderServiceImpl implements IOrderService{
 
         orders.stream().forEach(o -> numbers.add(Integer.parseInt(o.getNumber())));
 
+        if (orders.isEmpty()){
+            number=1;
+        }else{
+            number=numbers.stream().max(Integer::compare).get();
+            number++;
+        }
+
         numberConcatenated += String.valueOf(number);
 
         int initialCount = Math.max(0, (numberConcatenated.length()-10));

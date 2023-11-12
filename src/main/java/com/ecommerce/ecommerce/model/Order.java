@@ -3,6 +3,7 @@ package com.ecommerce.ecommerce.model;
 import jakarta.persistence.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -67,11 +68,11 @@ public class Order {
         this.user = user;
     }
 
-    public OrderDetail getDetails() {
+    public List<OrderDetail> getDetails() {
         return details;
     }
 
-    public void setDetails(OrderDetail details) {
+    public void setDetails(List<OrderDetail> details) {
         this.details = details;
     }
 
@@ -96,6 +97,6 @@ public class Order {
     private double total;
     @ManyToOne
     private User user;
-    @OneToOne (mappedBy = "order")
-    private OrderDetail details;
+    @OneToMany (mappedBy = "order")
+    private List<OrderDetail> details;
 }

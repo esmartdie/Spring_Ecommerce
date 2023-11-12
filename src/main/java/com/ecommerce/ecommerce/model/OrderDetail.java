@@ -91,7 +91,7 @@ public class OrderDetail {
     private double quantity;
     private double price;
     private double total;
-    @OneToOne
+    @ManyToOne
     private Order order;
     @ManyToOne
     private Product product;
