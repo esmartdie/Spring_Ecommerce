@@ -3,7 +3,9 @@ package com.ecommerce.ecommerce.controller;
 import com.ecommerce.ecommerce.model.Product;
 import com.ecommerce.ecommerce.model.User;
 import com.ecommerce.ecommerce.service.IProductService;
+import com.ecommerce.ecommerce.service.IUserService;
 import com.ecommerce.ecommerce.service.UploadFileService;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -30,9 +32,9 @@ public class ProductController {
     }
 
     @PostMapping("/save")
-    public String save(Product product, @RequestParam("img") MultipartFile file) throws IOException {
+    public String save(Product product, @RequestParam("img") MultipartFile file, HttpSession session) throws IOException {
         LOGGER.info("This is the object product {}", product);
-        User u = new User(1,"","","","","","","");
+        User u = userService.findById(Integer.parseInt(session.getAttribute("userId").toString())).get();
         product.setUser(u);
 
         if(product.getId()==null){
@@ -95,4 +97,7 @@ public class ProductController {
     private IProductService IProductService;
     @Autowired
     private UploadFileService upload;
+
+    @Autowired
+    private IUserService userService;
 }

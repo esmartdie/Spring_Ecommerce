@@ -8,6 +8,7 @@ import com.ecommerce.ecommerce.service.IOrderDetailService;
 import com.ecommerce.ecommerce.service.IOrderService;
 import com.ecommerce.ecommerce.service.IProductService;
 import com.ecommerce.ecommerce.service.IUserService;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +30,9 @@ import static java.util.Arrays.stream;
 public class HomeController {
 
     @GetMapping("")
-    public String home(Model model){
+    public String home(Model model, HttpSession session){
 
+        LOG.info("User session: {}", session.getAttribute("userId"));
         model.addAttribute("products", productService.findAll());
 
         return "/user/home";
@@ -118,9 +120,9 @@ public class HomeController {
     }
 
     @GetMapping("/order")
-    public String order(Model model){
+    public String order(Model model, HttpSession session){
 
-        User user = userService.findById(2).get();
+        User user = userService.findById(Integer.parseInt(session.getAttribute("userId").toString())).get();
 
         model.addAttribute("cart", details);
         model.addAttribute("order", order);
@@ -130,13 +132,13 @@ public class HomeController {
     }
 
     @GetMapping("/saveOrder")
-    public String saveOrder(){
+    public String saveOrder(HttpSession session){
 
         Date creationDate = new Date();
         order.setCreationDate(creationDate);
         order.setNumber(orderService.generateOrderIdentification());
 
-        User user = userService.findById(2).get();
+        User user = userService.findById(Integer.parseInt(session.getAttribute("userId").toString())).get();
         order.setUser(user);
 
         orderService.save(order);
