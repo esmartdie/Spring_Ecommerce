@@ -55,11 +55,11 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td >4555454</td>
-                  <td >Fecha de Compra</td>
-                  <td >Total</td>
-                  <td><a href="detallecompra.html" class="btn btn-success">Ver Detalle</a></td>
+                <tr th:each="order: ${orders}">
+                  <td th:text="${order.number}"></td>
+                  <td th:text="${order.creationDate}"></td>
+                  <td th:text="${order.total}"></td>
+                  <td><a th:href="@{/user/details/{id} (id=${order.id})}" class="btn btn-success">Show Details</a></td>
                 </tr>
               </tbody>
             </table>
