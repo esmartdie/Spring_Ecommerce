@@ -77,8 +77,6 @@ public class HomeController {
             details.add(orderDetail);
         }
 
-
-
         totalSum = details.stream().mapToDouble(dt->dt.getTotal()).sum();
 
         order.setTotal(totalSum);

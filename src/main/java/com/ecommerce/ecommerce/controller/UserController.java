@@ -89,8 +89,9 @@ public class UserController {
     }
 
     @GetMapping("/close")
-    public String closeSession(){
+    public String closeSession(HttpSession session){
 
+        session.removeAttribute("userId");
         return "redirect:/";
     }
 
