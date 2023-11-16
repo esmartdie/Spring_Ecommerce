@@ -17,12 +17,13 @@
   <!-- Custom styles for this template -->
   <link th:href="@{/css/heroic-features.css}" rel="stylesheet">
 
+
 </head>
 
 <body>
 
 <!-- Navigation -->
-<div th:insert="~{administrator/template_admin.html::header}"></div>
+<div th:insert="~{administrator/template_admin.html::header}"></div>>
 
     <!-- Page Content -->
     <div class="container">
@@ -30,12 +31,13 @@
 
       <!-- Page Heading/Breadcrumbs -->
       <h1 class="mt-4 mb-3">
-        Spring eCommerce <small>Orders</small>
+        Spring eCommerce <small>Detalles</small>
       </h1>
 
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-        <li class="breadcrumb-item active">Orders</li>
+        <li class="breadcrumb-item"><a href="compras.html">Shopping</a></li>
+        <li class="breadcrumb-item active">Shopping Details</li>
       </ol>
 
       <!-- Blog Post -->
@@ -46,18 +48,18 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th scope="col">Order Number</th>
-                  <th scope="col">Date</th>
-                  <th scope="col">Total</th>
-                  <th scope="col">Action</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col">Product</th>
+                  <th scope="col">Price</th>
+                  <th scope="col">Total</th>                  
                 </tr>
               </thead>
               <tbody>
-                <tr th:each="order:${orders}">
-                  <td th:text="${order.number}"></td>
-                  <td th:text="${order.receptionDate}"></td>
-                  <td th:text="${order.total}"></td>
-                  <td><a th:href="@{/administrator/details/{id} (id=${order.id})}" class="btn btn-success">Show Details</a></td>
+                <tr th:each="detail:${orderdetails}">
+                  <td th:text="${detail.quantity}"></td>
+                  <td th:text="${detail.name}"></td>
+                  <td th:text="${detail.price}"></td>
+                  <td th:text="${detail.total}"></td>
                 </tr>
               </tbody>
             </table>
@@ -78,3 +80,4 @@
 </body>
 
 </html>
+
