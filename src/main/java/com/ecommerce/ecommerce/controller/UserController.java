@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +35,7 @@ public class UserController {
 
         LOG.info("User registry: {}", user);
         user.setUserRol("USER");
+        user.setPassword(passEncoder.encode(user.getPassword()));
         userService.save(user);
         return "redirect:/";
     }
@@ -47,7 +49,7 @@ public class UserController {
     public String access(User user, HttpSession session){
         LOG.info("Access : {}", user);
 
-        Optional<User> userOp = userService.findByEmail(user.getEmail());
+        Optional<User> userOp = userService.findById(Integer.parseInt(session.getAttribute("userId").toString()));
         LOG.info("User of db: {}", userOp.get());
 
         if(userOp.isPresent()){
@@ -95,6 +97,8 @@ public class UserController {
         return "redirect:/";
     }
 
+
+    BCryptPasswordEncoder passEncoder = new BCryptPasswordEncoder();
 
     @Autowired
     private IUserService userService;
