@@ -5,6 +5,7 @@ import com.ecommerce.ecommerce.model.Product;
 import com.ecommerce.ecommerce.service.IOrderService;
 import com.ecommerce.ecommerce.service.IProductService;
 import com.ecommerce.ecommerce.service.IUserService;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,7 @@ public class AdministratorController {
 
         return "administrator/shoppingdetails";
     }
+
 
 
     private final Logger LOGG = LoggerFactory.getLogger(AdministratorController.class);

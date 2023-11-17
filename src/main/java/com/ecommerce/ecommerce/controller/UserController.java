@@ -49,7 +49,7 @@ public class UserController {
     public String access(User user, HttpSession session){
         LOG.info("Access : {}", user);
 
-        Optional<User> userOp = userService.findById(Integer.parseInt(session.getAttribute("userId").toString()));
+        Optional<User> userOp = userService.findByEmail(user.getEmail());
         LOG.info("User of db: {}", userOp.get());
 
         if(userOp.isPresent()){
