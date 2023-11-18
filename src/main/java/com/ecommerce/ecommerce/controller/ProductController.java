@@ -40,10 +40,7 @@ public class ProductController {
         if(product.getId()==null){
             String imageName= upload.saveImage(file);
             product.setImage(imageName);
-        }else{
-
         }
-
 
         IProductService.save(product);
         return "redirect:/products";

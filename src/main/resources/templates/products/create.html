@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
 
@@ -30,51 +30,52 @@
 
   <!-- Page Heading/Breadcrumbs -->
   <h1 class="mt-4 mb-3">
-    Spring eCommerce <small>Productos</small>
+    Spring eCommerce <small>Products</small>
   </h1>
 
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-    <li class="breadcrumb-item active">Crear Productos</li>
+    <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+    <li class="breadcrumb-item active"> <a th:href="@{/products}">Products</a></li>
+    <li class="breadcrumb-item active">New Product</li>
   </ol>
 
-  <h2>Crear Producto</h2>
+  <h2>Add new Product</h2>
   <form class="form-horizontal" th:action="@{/products/save}" method="post" enctype="multipart/form-data">
     <div class="form-group">
-      <label class="control-label col-sm-2" for="name">Nombre:</label>
+      <label class="control-label col-sm-2" for="name">Name: </label>
       <div class="col-sm-10">
         <input type="text" class="form-control" id="name" name="name"
-        placeholder="Ingrese el nombre del producto" autocomplete="off" required>
+        placeholder="Insert the product name" autocomplete="off" required>
       </div>
     </div>
     <div class="form-group">
-      <label class="control-label col-sm-2" for="description">Descripción:</label>
+      <label class="control-label col-sm-2" for="description">Description :</label>
       <div class="col-sm-10">
         <textarea class="form-control" id="description" name="description"
-        placeholder="Ingrese la descripcion del producto" required
+        placeholder="Insert the product description" required
         autocomplete="off"> </textarea>
       </div>
     </div>
 
     <div class="form-group">
-      <label class="control-label col-sm-2" for="quantity">Cantidad:</label>
+      <label class="control-label col-sm-2" for="quantity">Quantity: </label>
       <div class="col-sm-10">
         <input type="number" class="form-control" id="quantity"
-        name="quantity" placeholder="Ingrese la cantidad del producto"
+        name="quantity" placeholder="Insert the product quantity"
         required autocomplete="off">
       </div>
     </div>
 
     <div class="form-group">
-      <label class="control-label col-sm-2" for="price">Precio:</label>
+      <label class="control-label col-sm-2" for="price">Price: </label>
       <div class="col-sm-10">
         <input type="number" class="form-control" step="any" id="price" name="price"
-        placeholder="Ingrese el precio del producto" autocomplete="off" required>
+        placeholder="Insert the product price" autocomplete="off" required>
       </div>
     </div>
 
     <div class="form-group">
-      <label class="control-label col-sm-2" for="img">Imagen:</label>
+      <label class="control-label col-sm-2" for="img">Product Image:</label>
       <div class="col-sm-10">
         <input type="file" class="form-control-file" id="img" name="img">
       </div>
@@ -83,7 +84,7 @@
     <div class="row">
       <div class="col-sm-2">
         <button type="submit" class="btn btn-success">
-          <span class="glyphicon glyphicon-saved"></span> Guardar
+          <span class="glyphicon glyphicon-saved"></span> Save
         </button>
       </div>
     </div>

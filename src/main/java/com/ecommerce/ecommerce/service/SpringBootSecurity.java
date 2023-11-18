@@ -45,6 +45,8 @@ public class SpringBootSecurity {
                         .requestMatchers("/products/**").hasRole("ADMIN")
                         .requestMatchers("/").permitAll()
                         .anyRequest().authenticated()
+                        //.anyRequest().authenticated()
+
                 )
                 .formLogin(form -> form
                         .loginPage("/user/login")
