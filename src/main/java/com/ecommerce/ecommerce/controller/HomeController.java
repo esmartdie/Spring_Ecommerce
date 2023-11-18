@@ -37,7 +37,7 @@ public class HomeController {
 
         model.addAttribute("session", session.getAttribute("userId"));
 
-        return "/administrator/home";
+        return "/user/home";
     }
 
     @GetMapping("/producthome/{id}")
