@@ -44,7 +44,6 @@ public class SpringBootSecurity {
                         .requestMatchers("/administrator/**").hasRole("ADMIN")
                         .requestMatchers("/products/**").hasRole("ADMIN")
                         .requestMatchers("/").permitAll()
-                        .anyRequest().authenticated()
                         //.anyRequest().authenticated()
 
                 )
