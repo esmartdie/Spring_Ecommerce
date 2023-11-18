@@ -45,12 +45,12 @@ public class UserController {
         return "user/login";
     }
 
-    @PostMapping("/access")
+    @GetMapping("/access")
     public String access(User user, HttpSession session){
         LOG.info("Access : {}", user);
 
         Optional<User> userOp = userService.findById(Integer.parseInt(session.getAttribute("userId").toString()));
-        LOG.info("User of db: {}", userOp.get());
+        //LOG.info("User of db: {}", userOp.get());
 
         if(userOp.isPresent()){
             session.setAttribute("userId", userOp.get().getId());
