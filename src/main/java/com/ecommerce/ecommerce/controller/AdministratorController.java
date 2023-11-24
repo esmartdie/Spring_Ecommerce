@@ -15,7 +15,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/administrator")
@@ -41,7 +44,30 @@ public class AdministratorController {
     @GetMapping("/orders")
     public String orders(Model model){
 
+        /*
+        List<Order> orders = orderService.findAll();
+
+        SimpleDateFormat dayFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+
+        List <Order> ordersFormatted = orders.stream()
+                        .map( order -> {
+                            Order orderCopy = new Order();
+                            orderCopy.setId(order.getId());
+                            orderCopy.setNumber(order.getNumber());
+                            orderCopy.setCreationDate(new Date(dayFormat.format(order.getCreationDate())));
+                            orderCopy.setReceptionDate(order.getReceptionDate());
+                            orderCopy.setTotal(order.getTotal());
+                            return orderCopy;
+                        })
+                        .collect(Collectors.toList());
+
+         finally decide to manage date format with thymeleaf
+
+         */
+
         model.addAttribute("orders", orderService.findAll());
+
         return "administrator/orders";
     }
 
