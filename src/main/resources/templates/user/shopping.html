@@ -57,7 +57,7 @@
               <tbody>
                 <tr th:each="order: ${orders}">
                   <td th:text="${order.number}"></td>
-                  <td th:text="${order.creationDate}"></td>
+                  <td th:text="${#dates.format(order.creationDate, 'dd/MM/yyyy')}"></td>
                   <td th:text="${order.total}"></td>
                   <td><a th:href="@{/user/details/{id} (id=${order.id})}" class="btn btn-success">Show Details</a></td>
                 </tr>

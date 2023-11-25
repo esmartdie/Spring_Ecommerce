@@ -59,7 +59,14 @@
             <tr th:each="dorder:${cart}">
               <td th:text="${dorder.name}"></td>
               <td th:text="${dorder.price}"></td>
-              <td th:text="${dorder.quantity}"></td>
+              <td>
+                <form th:action="@{/updateQuantity}" method="post">
+                  <input type="number" id="quantity" name="quantity" autocomplete="off"
+                         min="1" max="5" th:value="${dorder.quantity}">
+                  <input type="hidden" name="productId" th:value="${dorder.product.id}">
+                  <button type="submit" class="btn btn-primary">Update</button>
+                </form>
+              </td>
               <td th:text="${dorder.total}"></td>
               <td><a th:href="@{/delete/cart/{id} (id=${dorder.product.id})}" class="btn btn-danger">Remove</a></td>
             </tr>

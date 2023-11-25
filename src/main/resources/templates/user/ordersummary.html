@@ -22,7 +22,9 @@
 <body>
 
 <!-- Navigation -->
-<div th:insert=~{user/template_user.html::header}></div>
+<div th:insert="~{user/template_user.html::header}" th:if="${session==null}"></div>
+
+<div th:insert="~{user/template_user.html::header-user}" th:unless="${session==null}"></div>
 
 <!-- Page Content -->
 <div class="container">
@@ -30,12 +32,13 @@
 
     <!-- Page Heading/Breadcrumbs -->
     <h1 class="mt-4 mb-3">
-        Spring eCommerce <small>Resumen de la orden</small>
+        Spring eCommerce <small>Order Summary</small>
     </h1>
 
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-        <li class="breadcrumb-item active">Orden</li>
+        <li class="breadcrumb-item"><a th:href="@{/getCart}">Cart</a></li>
+        <li class="breadcrumb-item active">Order</li>
     </ol>
 
     <!-- Blog Post -->

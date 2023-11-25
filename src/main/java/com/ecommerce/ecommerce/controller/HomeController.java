@@ -121,6 +121,30 @@ public class HomeController {
         return "/user/cart";
     }
 
+    @PostMapping("/updateQuantity")
+    public String updateQuantity(@RequestParam Integer productId, @RequestParam Integer quantity, Model model, HttpSession session) {
+
+        User user = userService.findById(Integer.parseInt(session.getAttribute("userId").toString())).get();
+
+        Optional<OrderDetail> orderDetailOptional = details.stream()
+                .filter(detail -> detail.getProduct().getId().equals(productId))
+                .findFirst();
+
+        if (orderDetailOptional.isPresent()) {
+            OrderDetail orderDetail = orderDetailOptional.get();
+            orderDetail.setQuantity(quantity);
+            orderDetail.setTotal(orderDetail.getPrice() * quantity);
+        }
+
+        order.setTotal(details.stream().mapToDouble(OrderDetail::getTotal).sum());
+
+        model.addAttribute("cart", details);
+        model.addAttribute("order", order);
+        model.addAttribute("user", user);
+
+        return "user/ordersummary";
+    }
+
     @GetMapping("/order")
     public String order(Model model, HttpSession session){
 
