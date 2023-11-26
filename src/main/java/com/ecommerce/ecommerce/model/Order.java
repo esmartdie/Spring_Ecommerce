@@ -76,6 +76,14 @@ public class Order {
         this.details = details;
     }
 
+    public OrderStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
@@ -99,4 +107,8 @@ public class Order {
     private User user;
     @OneToMany (mappedBy = "order")
     private List<OrderDetail> details;
+
+    @ManyToOne
+    @JoinColumn(name = "status_id")
+    private OrderStatus status;
 }

@@ -1,13 +1,8 @@
 package com.ecommerce.ecommerce.controller;
 
-import com.ecommerce.ecommerce.model.Order;
-import com.ecommerce.ecommerce.model.OrderDetail;
-import com.ecommerce.ecommerce.model.Product;
-import com.ecommerce.ecommerce.model.User;
-import com.ecommerce.ecommerce.service.IOrderDetailService;
-import com.ecommerce.ecommerce.service.IOrderService;
-import com.ecommerce.ecommerce.service.IProductService;
-import com.ecommerce.ecommerce.service.IUserService;
+import com.ecommerce.ecommerce.model.*;
+import com.ecommerce.ecommerce.repository.IOrderStatusRepository;
+import com.ecommerce.ecommerce.service.*;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -183,6 +178,9 @@ public class HomeController {
         User user = userService.findById(Integer.parseInt(session.getAttribute("userId").toString())).get();
         order.setUser(user);
 
+        OrderStatus orderStatus = orderStatusService.findById(9).get();
+        order.setStatus(orderStatus);
+
         orderService.save(order);
 
         for (OrderDetail od:details){
@@ -224,5 +222,8 @@ public class HomeController {
 
     @Autowired
     private IOrderDetailService orderDetailService;
+
+    @Autowired
+    private IOrderStatusService orderStatusService;
 
 }

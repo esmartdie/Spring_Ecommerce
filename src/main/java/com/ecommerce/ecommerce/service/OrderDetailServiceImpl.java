@@ -10,6 +10,7 @@ public class OrderDetailServiceImpl implements IOrderDetailService{
 
     @Override
     public OrderDetail save(OrderDetail orderDetail) {
+
         return orderDetailsRepository.save(orderDetail);
     }
 
