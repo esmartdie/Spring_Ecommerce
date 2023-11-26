@@ -33,7 +33,7 @@
 
       <!-- Page Heading/Breadcrumbs -->
       <h1 class="mt-4 mb-3">
-        Spring eCommerce <small>Detalles</small>
+        Spring eCommerce <small>Order Generated Details</small>
       </h1>
 
       <ol class="breadcrumb">
@@ -50,16 +50,16 @@
             <table class="table">
               <thead>
                 <tr>
-                  <th scope="col">Quantity</th>
                   <th scope="col">Product</th>
+                  <th scope="col">Quantity</th>
                   <th scope="col">Price</th>
                   <th scope="col">Total</th>                  
                 </tr>
               </thead>
               <tbody>
                 <tr th:each="details:${details}">
-                  <td th:text="${details.quantity}"></td>
                   <td th:text="${details.name}"></td>
+                  <td th:text="${details.quantity}"></td>
                   <td th:text="${details.price}"></td>
                   <td th:text="${details.total}"></td>
                 </tr>

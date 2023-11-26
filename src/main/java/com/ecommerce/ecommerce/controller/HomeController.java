@@ -146,19 +146,35 @@ public class HomeController {
     }
 
     @GetMapping("/order")
-    public String order(Model model, HttpSession session){
+    public String order(Model model, HttpSession session) {
 
-        User user = userService.findById(Integer.parseInt(session.getAttribute("userId").toString())).get();
+        Object userIdAttribute = session.getAttribute("userId");
 
-        model.addAttribute("cart", details);
-        model.addAttribute("order", order);
-        model.addAttribute("user", user);
+        if (userIdAttribute != null) {
+            try {
+                Integer userId = Integer.parseInt(userIdAttribute.toString());
 
-        return "user/ordersummary";
+                Optional<User> userOp = userService.findById(userId);
+
+                User user = userOp.get();
+                model.addAttribute("cart", details);
+                model.addAttribute("order", order);
+                model.addAttribute("user", user);
+
+                return "user/ordersummary";
+
+            } catch (NumberFormatException e) {
+                return "redirect:/user/login";
+            }
+        } else {
+          return "redirect:/user/login";
+       }
     }
 
+
+
     @GetMapping("/saveOrder")
-    public String saveOrder(HttpSession session){
+    public String saveOrder(HttpSession session, Model model){
 
         Date creationDate = new Date();
         order.setCreationDate(creationDate);
@@ -174,10 +190,13 @@ public class HomeController {
             orderDetailService.save(od);
         }
 
+        String url= "redirect:/user/details/"+order.getId();
+
         order = new Order();
         details.clear();
 
-        return "redirect:/";
+        return url;
+
     }
 
     @PostMapping("/search")

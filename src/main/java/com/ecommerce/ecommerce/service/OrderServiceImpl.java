@@ -57,6 +57,11 @@ public class OrderServiceImpl implements IOrderService{
         return orderRepository.findById(id);
     }
 
+    @Override
+    public Optional<Order> findByNumber(String number) {
+        return orderRepository.findByNumber(number);
+    }
+
     @Autowired
     private IOrderRepository orderRepository;
 }

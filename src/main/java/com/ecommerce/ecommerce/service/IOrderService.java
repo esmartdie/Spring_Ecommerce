@@ -18,4 +18,6 @@ public interface IOrderService {
     List<Order> findByUser(User user);
 
     Optional <Order> findById(Integer id);
+
+    Optional<Order> findByNumber(String number);
 }
