@@ -17,6 +17,7 @@
   <!-- Custom styles for this template -->
   <link th:href="@{css/heroic-features.css}" rel="stylesheet">
 
+
 </head>
 
 <body>
@@ -43,12 +44,10 @@
               <p class="card-text" th:text="${product.name}"></p>
             </div>
             <div class="card-footer">
-              <a href="productohome.html" class="btn btn-success">Show Product</a>
+              <a th:href="@{producthome/{id} (id=${product.id})}" class="btn btn-success">Show Product</a>
             </div>
           </div>
         </div>
-
-
 
       </div>
       <!-- /.row -->
