@@ -49,6 +49,7 @@
               <thead>
                 <tr>
                   <th scope="col">Orden nº</th>
+                  <th scope="col">Orden Status</th>
                   <th scope="col">Date</th>
                   <th scope="col">Value</th>
                   <th scope="col">Acción</th>
@@ -57,6 +58,7 @@
               <tbody>
                 <tr th:each="order: ${orders}">
                   <td th:text="${order.number}"></td>
+                  <td th:text="${order.status == null ? 'N/A' : order.status.status}"></td>
                   <td th:text="${#dates.format(order.creationDate, 'dd/MM/yyyy')}"></td>
                   <td th:text="${order.total}"></td>
                   <td><a th:href="@{/user/details/{id} (id=${order.id})}" class="btn btn-success">Show Details</a></td>

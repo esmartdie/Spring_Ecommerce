@@ -35,10 +35,28 @@
       </h1>
 
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a th:href=@{/administrator}">Home</a></li>
+        <li class="breadcrumb-item"><a th:href="@{/administrator}">Home</a></li>
         <li class="breadcrumb-item"><a th:href="@{/administrator/orders}">Orders</a></li>
         <li class="breadcrumb-item active">Shopping Details</li>
       </ol>
+
+      <!-- Order Information -->
+      <div>
+        <h4>Order Information</h4>
+        <ul>
+          <li>Order User: <span th:text="${order.user.email}"></span></li>
+          <li>Order Number: <span th:text="${order.number}"></span></li>
+          <li>
+            Order Status:
+            <form th:action="@{/administrator/updateOrderStatus}" method="post">
+              <input type="hidden" name="orderId" th:value="${order.id}" />
+              <select name="newStatus">
+                <option th:each="status : ${orderStatusList}" th:value="${status.status}" th:selected="${status.status == order.status.status}" th:text="${status.status}"></option>
+              </select>
+              <button type="submit" class="btn btn-warning">Edit</button>
+            </form>
+          </li>
+        </ul>
 
       <!-- Blog Post -->
       <div class="card mb-4">
