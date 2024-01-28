@@ -21,8 +21,7 @@
 <body>
 
 <!-- Navigation -->
-<div th:insert="~{user/template_user.html::header}" th:if="${session.userId == null}"></div>
-<div th:insert="~{user/template_user.html::header-user}" th:unless="${session.userId == null}"></div>
+<div th:insert="~{administrator/template_admin.html::header}"></div>
 
     <!-- Page Content -->
     <div class="container">
@@ -34,7 +33,7 @@
       </h1>
 
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+        <li class="breadcrumb-item"><a th:href="@{/administrator}">Home</a></li>
         <li class="breadcrumb-item active">Product</li>
       </ol>
 
@@ -58,14 +57,14 @@
                   <li class="list-group-item">
                     <p th:text="'Description: ' + ${product.description}"></p>
                   </li>
-                  <li class="list-group-item"><h6>
+                  <li class="list-group-item" hidden><h6>
                     Quantity: <input type="number" id="quantity" name="quantity" autocomplete="off"
                     min="1" max="5" value="1">
                   </h6></li>
                 </ul>
 
 
-                <button type="submit"  class="btn btn-dark">Add to Cart</button>
+                <button hidden type="submit"  class="btn btn-dark">Add to Cart</button>
 
               </form>
             </div>

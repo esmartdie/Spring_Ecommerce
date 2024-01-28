@@ -73,6 +73,14 @@ public class OrderDetail {
         this.product = product;
     }
 
+    public ProductInventory getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(ProductInventory inventory) {
+        this.inventory = inventory;
+    }
+
     @Override
     public String toString() {
         return "OrderDetails{" +
@@ -95,5 +103,7 @@ public class OrderDetail {
     private Order order;
     @ManyToOne
     private Product product;
+    @OneToOne(mappedBy = "details", cascade = CascadeType.ALL)
+    private ProductInventory inventory;
 
 }

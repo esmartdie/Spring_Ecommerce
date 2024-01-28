@@ -2,6 +2,8 @@ package com.ecommerce.ecommerce.model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "products")
 public class Product {
@@ -98,5 +100,7 @@ public class Product {
     private int quantity;
     @ManyToOne
     private User user;
+    @OneToMany(mappedBy = "product")
+    private List<ProductInventory> inventory;
 
 }

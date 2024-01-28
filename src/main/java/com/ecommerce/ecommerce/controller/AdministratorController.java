@@ -3,10 +3,8 @@ package com.ecommerce.ecommerce.controller;
 import com.ecommerce.ecommerce.model.Order;
 import com.ecommerce.ecommerce.model.OrderStatus;
 import com.ecommerce.ecommerce.model.Product;
-import com.ecommerce.ecommerce.service.IOrderService;
-import com.ecommerce.ecommerce.service.IOrderStatusService;
-import com.ecommerce.ecommerce.service.IProductService;
-import com.ecommerce.ecommerce.service.IUserService;
+import com.ecommerce.ecommerce.model.ProductInventory;
+import com.ecommerce.ecommerce.service.*;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -39,6 +38,22 @@ public class AdministratorController {
 
         model.addAttribute("users", userService.findAll());
         return "administrator/users";
+    }
+
+    @GetMapping("/producthomeadmin/{id}")
+    public String productHome(@PathVariable Integer id, Model model){
+        LOGG.info("Product Id sent as argument {}", id);
+
+        Product product = new Product();
+        Optional<Product> optionalProduct = productService.getProduct(id);
+        product = optionalProduct.get();
+
+        ProductInventory latestInventory = productInventoryService.findLastProduct(product);
+
+        model.addAttribute("inventory", latestInventory);
+        model.addAttribute("product", product);
+
+        return "administrator/product_home";
     }
 
     @GetMapping("/orders")
@@ -118,4 +133,7 @@ public class AdministratorController {
 
     @Autowired
     private IOrderStatusService orderStatusService;
+
+    @Autowired
+    private IProductInventoryService productInventoryService;
 }

@@ -11,10 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.stream;
@@ -43,6 +40,9 @@ public class HomeController {
         Optional<Product> optionalProduct = productService.getProduct(id);
         product = optionalProduct.get();
 
+        ProductInventory latestInventory = productInventoryService.findLastProduct(product);
+
+        model.addAttribute("inventory", latestInventory);
         model.addAttribute("product", product);
 
         return "/user/product_home.html";
@@ -50,6 +50,17 @@ public class HomeController {
 
     @PostMapping("/cart")
     public String addCart(@RequestParam Integer id, @RequestParam Integer quantity, Model model){
+
+        int availableQuantity = productInventoryService.findLastProduct(
+                productService.getProduct(id).get()
+        ).getFinalQuantity();
+
+        if (quantity > availableQuantity) {
+            model.addAttribute("error", "Not enough available units to complete the purchase");
+            return "redirect:/producthome/" + id;
+        }
+
+
         OrderDetail orderDetail = new OrderDetail();
         Product product = new Product();
         double totalSum = 0;
@@ -76,6 +87,7 @@ public class HomeController {
 
         order.setTotal(totalSum);
 
+        model.addAttribute("availableQuantity",availableQuantity);
         model.addAttribute("cart", details);
         model.addAttribute("order", order);
 
@@ -186,15 +198,45 @@ public class HomeController {
         for (OrderDetail od:details){
             od.setOrder(order);
             orderDetailService.save(od);
+            createProductInventoryLog(od,order, creationDate);
         }
 
         String url= "redirect:/user/details/"+order.getId();
+
 
         order = new Order();
         details.clear();
 
         return url;
 
+    }
+
+    private void createProductInventoryLog(OrderDetail od,Order order, Date logDate) {
+
+        Product product = od.getProduct();
+
+        List<ProductInventory> productInventoryList = productInventoryService.findByProduct(product);
+
+        if (!productInventoryList.isEmpty()) {
+
+            productInventoryList.sort(Comparator.comparing(ProductInventory::getDate).reversed());
+
+            ProductInventory latestInventory = productInventoryList.get(0);
+
+            int finalExistence = latestInventory.getFinalQuantity();
+
+            ProductInventory pI = new ProductInventory();
+            pI.setDate(logDate);
+            pI.setOperationName("Order created: "+order.getNumber());
+            pI.setInitialQuantity(finalExistence);
+            pI.setOperationQuantity((int) od.getQuantity());
+            pI.setFinalQuantity(pI.getInitialQuantity()-pI.getOperationQuantity());
+            pI.setProduct(product);
+            pI.setDetails(od);
+
+            productInventoryService.save(pI);
+
+        }
     }
 
     @PostMapping("/search")
@@ -225,5 +267,10 @@ public class HomeController {
 
     @Autowired
     private IOrderStatusService orderStatusService;
+
+    private ProductInventory pI = new ProductInventory();
+
+    @Autowired
+    private IProductInventoryService productInventoryService;
 
 }
