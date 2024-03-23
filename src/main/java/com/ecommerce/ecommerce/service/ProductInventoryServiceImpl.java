@@ -6,9 +6,7 @@ import com.ecommerce.ecommerce.repository.IProductInventoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ProductInventoryServiceImpl implements IProductInventoryService{
@@ -36,7 +34,7 @@ public class ProductInventoryServiceImpl implements IProductInventoryService{
     @Override
     public ProductInventory findLastProduct (Product product){
 
-        List<ProductInventory> productInventoryList = productInventoryService.findByProduct(product);
+        List<ProductInventory> productInventoryList = productInventoryRepository.findByProduct(product);
 
         productInventoryList.sort(Comparator.comparing(ProductInventory::getDate).reversed());
 
@@ -47,6 +45,4 @@ public class ProductInventoryServiceImpl implements IProductInventoryService{
     @Autowired
     private IProductInventoryRepository productInventoryRepository;
 
-    @Autowired
-    private IProductInventoryRepository productInventoryService;
 }

@@ -48,46 +48,71 @@ public class HomeController {
         return "/user/product_home.html";
     }
 
-    @PostMapping("/cart")
-    public String addCart(@RequestParam Integer id, @RequestParam Integer quantity, Model model){
 
-        int availableQuantity = productInventoryService.findLastProduct(
-                productService.getProduct(id).get()
-        ).getFinalQuantity();
+
+    @PostMapping("/cart")
+    public String addCart(@RequestParam Integer id, @RequestParam Integer quantity, Model model, HttpSession session) {
+
+        Optional<Product> optionalProduct = productService.getProduct(id);
+        if (!optionalProduct.isPresent()) {
+            // Handle case where product is not found
+            return "redirect:/producthome/" + id;
+        }
+
+        Product product = optionalProduct.get();
+
+        List<OrderDetail> details = (List<OrderDetail>) session.getAttribute("cart");
+        if (details == null) {
+            details = new ArrayList<>();
+            session.setAttribute("cart", details);
+        }
+
+        Integer availableQuantity = productInventoryService.findLastProduct(product).getFinalQuantity();
+
+        if (availableQuantity == null) {
+            // Handle case where available quantity is not found
+            return "redirect:/producthome/" + id;
+        }
 
         if (quantity > availableQuantity) {
             model.addAttribute("error", "Not enough available units to complete the purchase");
             return "redirect:/producthome/" + id;
         }
 
+        // Proceed with adding the product to the cart
+        // Check if the product already exists in the cart
+        OrderDetail existingOrderDetail = details.stream()
+                .filter(detail -> detail.getProduct().getId().equals(product.getId()))
+                .findFirst()
+                .orElse(null);
 
-        OrderDetail orderDetail = new OrderDetail();
-        Product product = new Product();
-        double totalSum = 0;
-        Optional<Product> optionalProduct = productService.getProduct(id);
-
-        LOG.info("Product added: {}", optionalProduct.get());
-        LOG.info("Quantity: {}", quantity);
-
-        product=optionalProduct.get();
-        orderDetail.setQuantity(quantity);
-        orderDetail.setPrice(product.getPrice());
-        orderDetail.setName(product.getName());
-        orderDetail.setTotal(product.getPrice()*quantity);
-        orderDetail.setProduct(product);
-
-        Integer productId = product.getId();
-        boolean inserted = details.stream().anyMatch(p ->p.getProduct().getId()==productId);
-
-        if(!inserted){
+        if (existingOrderDetail != null) {
+            // Update the quantity of existing product in the cart
+            existingOrderDetail.setQuantity(existingOrderDetail.getQuantity() + quantity);
+            existingOrderDetail.setTotal(existingOrderDetail.getQuantity()*existingOrderDetail.getPrice());
+        } else {
+            // Add new product to the cart
+            OrderDetail orderDetail = new OrderDetail();
+            orderDetail.setQuantity(quantity);
+            orderDetail.setPrice(product.getPrice());
+            orderDetail.setName(product.getName());
+            orderDetail.setTotal(product.getPrice() * quantity);
+            orderDetail.setProduct(product);
             details.add(orderDetail);
         }
 
-        totalSum = details.stream().mapToDouble(dt->dt.getTotal()).sum();
+        Map<Integer, Integer> availableQuantitiesForCart = new HashMap<>();
+        for (OrderDetail orderDetail : details) {
+            Integer keyValueIdProduct = orderDetail.getProduct().getId();
+            Integer productFinalQuantity = productInventoryService.findLastProduct(orderDetail.getProduct()).getFinalQuantity();
+            availableQuantitiesForCart.put(keyValueIdProduct, productFinalQuantity);
+        }
 
+        double totalSum = details.stream().mapToDouble(OrderDetail::getTotal).sum();
         order.setTotal(totalSum);
 
-        model.addAttribute("availableQuantity",availableQuantity);
+        // Pass the available quantity for each product to the view
+        model.addAttribute("availableQuantitiesForCart", availableQuantitiesForCart);
         model.addAttribute("cart", details);
         model.addAttribute("order", order);
 
@@ -95,24 +120,32 @@ public class HomeController {
     }
 
     @GetMapping("/delete/cart/{id}")
-    public String removeProductCart(@PathVariable Integer id, Model model){
-        List <OrderDetail> newOrders = new ArrayList<OrderDetail>();
+    public String removeProductCart(@PathVariable Integer id, Model model, HttpSession session) {
 
-        for(OrderDetail orderDetail: details){
-            if(orderDetail.getProduct().getId() != id){
-                newOrders.add(orderDetail);
+        List<OrderDetail> details = (List<OrderDetail>) session.getAttribute("cart");
+
+        if (details != null) {
+
+            details.removeIf(orderDetail -> orderDetail.getProduct().getId().equals(id));
+
+            session.setAttribute("cart", details);
+
+            double totalSum = details.stream().mapToDouble(OrderDetail::getTotal).sum();
+            order.setTotal(totalSum);
+
+            Map<Integer, Integer> availableQuantitiesForCart = new HashMap<>();
+            for (OrderDetail orderDetail : details) {
+                Integer keyValueIdProduct = orderDetail.getProduct().getId();
+                Integer productFinalQuantity = productInventoryService.findLastProduct(orderDetail.getProduct()).getFinalQuantity();
+                availableQuantitiesForCart.put(keyValueIdProduct, productFinalQuantity);
             }
+
+            session.setAttribute("orderTotal", totalSum);
+
+            model.addAttribute("cart", details);
+            model.addAttribute("order", order);
+            model.addAttribute("availableQuantitiesForCart", availableQuantitiesForCart);
         }
-
-        details = newOrders;
-
-        double totalSum = 0;
-        totalSum = details.stream().mapToDouble(dt->dt.getTotal()).sum();
-
-        order.setTotal(totalSum);
-
-        model.addAttribute("cart", details);
-        model.addAttribute("order", order);
 
         return "user/cart";
     }
@@ -120,37 +153,37 @@ public class HomeController {
     @GetMapping("/getCart")
     public String getCart(Model model, HttpSession session){
 
+        List<OrderDetail> details = (List<OrderDetail>) session.getAttribute("cart");
+
+        Map<Integer, Integer> availableQuantitiesForCart = new HashMap<>();
+        for (OrderDetail orderDetail : details) {
+            Integer keyValueIdProduct = orderDetail.getProduct().getId();
+            Integer productFinalQuantity = productInventoryService.findLastProduct(orderDetail.getProduct()).getFinalQuantity();
+            availableQuantitiesForCart.put(keyValueIdProduct, productFinalQuantity);
+        }
+
         model.addAttribute("cart", details);
         model.addAttribute("order", order);
-
         model.addAttribute("session", session.getAttribute("userId"));
+        model.addAttribute("availableQuantitiesForCart", availableQuantitiesForCart);
 
         return "/user/cart";
     }
 
+    /*
     @PostMapping("/updateQuantity")
-    public String updateQuantity(@RequestParam Integer productId, @RequestParam Integer quantity, Model model, HttpSession session) {
+    public String updateQuantity(@RequestParam Map<String, String> quantitiesMap, Model model, HttpSession session) {
 
-        User user = userService.findById(Integer.parseInt(session.getAttribute("userId").toString())).get();
-
-        Optional<OrderDetail> orderDetailOptional = details.stream()
-                .filter(detail -> detail.getProduct().getId().equals(productId))
-                .findFirst();
-
-        if (orderDetailOptional.isPresent()) {
-            OrderDetail orderDetail = orderDetailOptional.get();
-            orderDetail.setQuantity(quantity);
-            orderDetail.setTotal(orderDetail.getPrice() * quantity);
+        for (Map.Entry<String, String> entry : quantitiesMap.entrySet()) {
+            Integer productId = Integer.parseInt(entry.getKey().substring("quantities-".length()));
+            Integer quantity = Integer.parseInt(entry.getValue());
+            // Aquí puedes realizar las acciones necesarias para actualizar la cantidad en la sesión o en la base de datos
         }
-
-        order.setTotal(details.stream().mapToDouble(OrderDetail::getTotal).sum());
-
-        model.addAttribute("cart", details);
-        model.addAttribute("order", order);
-        model.addAttribute("user", user);
-
-        return "user/ordersummary";
+        // Resto de la lógica del controlador
+        return "user/cart";
     }
+
+     */
 
     @GetMapping("/order")
     public String order(Model model, HttpSession session) {

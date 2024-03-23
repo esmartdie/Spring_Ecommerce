@@ -4,6 +4,7 @@ import com.ecommerce.ecommerce.model.Product;
 import com.ecommerce.ecommerce.model.ProductInventory;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface IProductInventoryService {
@@ -13,4 +14,5 @@ public interface IProductInventoryService {
     List<ProductInventory> findAll();
     List<ProductInventory> findByProduct(Product product);
     ProductInventory findLastProduct(Product product);
+
 }

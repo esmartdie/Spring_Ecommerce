@@ -41,52 +41,67 @@
   </ol>
 
   <!-- Blog Post -->
-  <div class="card mb-4">
-    <div class="card-body">
-      <div class="row">
-        <div class="col-lg-9">
-          <table class="table">
-            <thead>
-            <tr>
-              <th scope="col">Product</th>
-              <th scope="col">Price</th>
-              <th scope="col">Quantity</th>
-              <th scope="col">Total</th>
-              <th scope="col">Action</th>
-            </tr>
-            </thead>
+  <form th:action="@{/cart}" method="post">
+    <div class="row">
+      <div class="col-lg-9">
+        <table class="table">
+          <thead>
+          <tr>
+            <th scope="col">Product</th>
+            <th scope="col">Price</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Total</th>
+            <th scope="col">Action</th>
+          </tr>
+          </thead>
             <tbody>
-            <tr th:each="dorder:${cart}">
-              <td th:text="${dorder.name}"></td>
-              <td th:text="${dorder.price}"></td>
-              <td>
-                <form th:action="@{/updateQuantity}" method="post">
-                  <input type="number" id="quantity" name="quantity" autocomplete="off"
-                         min="1" th:max="${availableQuantity}" th:value="${dorder.quantity}">
-                  <input type="hidden" name="productId" th:value="${dorder.product.id}">
-                  <button type="submit" class="btn btn-primary">Update</button>
-                </form>
-              </td>
-              <td th:text="${dorder.total}"></td>
-              <td><a th:href="@{/delete/cart/{id} (id=${dorder.product.id})}" class="btn btn-danger">Remove</a></td>
+            <tr th:each="product, iterStat : ${cart}">
+                <td th:text="${product.name}"></td>
+                <td th:text="${product.price}"></td>
+                <td>
+                    <!-- Usa el iterStat.index como parte del identificador único -->
+                    <input type="hidden" name="productIds" th:value="${product.product.id}">
+                    <input type="number"
+                           th:name="'quantities-' + ${product.product.id}"
+                           autocomplete="off"
+                           min="1"
+                           th:if="${availableQuantitiesForCart.containsKey(product.product.id)}"
+                           th:max="${availableQuantitiesForCart.get(product.product.id)}"
+                           th:value="${product.quantity}">
+                </td>
+                <td th:text="${product.total}"></td>
+                <td>
+                    <a th:href="@{'/delete/cart/' + ${product.product.id}}" class="btn btn-danger">Remove</a>
+                </td>
             </tr>
             </tbody>
-          </table>
-        </div>
+        </table>
+      </div>
 
-        <div class="col-lg-3">
-          <h2 class="card-title">SUBTOTAL</h2>
+      <div class="col-lg-3">
+        <h2 class="card-title">SUBTOTAL</h2>
 
-          <ul class="list-group">
-            <li class="list-group-item"><h5 th:text="${order.total}"></h5></li>
-            <a th:href="@{/order}" class="btn btn-dark">View Order</a>
-          </ul>
-        </div>
-
+        <ul class="list-group">
+          <li class="list-group-item"><h5 th:text="${order.total}"></h5></li>
+          <a th:href="@{/order}" class="btn btn-dark">View Order</a>
+        </ul>
       </div>
     </div>
-  </div>
+    <!--<button type="submit" class="btn btn-primary">Update All</button>-->
+  </form>
+
+
+
 </div>
+<div>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+</div>
+
   <!-- /.container -->
 
   <!-- Footer -->
