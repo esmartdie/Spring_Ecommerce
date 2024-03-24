@@ -23,12 +23,19 @@ import java.util.stream.Collectors;
 @RequestMapping("/administrator")
 public class AdministratorController {
 
-
     @GetMapping("")
-    public String home(Model model){
+    public String home(@RequestParam(required = false) String productName, Model model){
+        if (productName != null && !productName.isEmpty()) {
 
-        List<Product> products = productService.findAll();
-        model.addAttribute("products", products);
+            List<Product> products = productService.findAll().stream()
+                    .filter(p -> p.getName().toLowerCase().contains(productName.toLowerCase()))
+                    .collect(Collectors.toList());
+            model.addAttribute("products", products);
+        } else {
+
+            List<Product> products = productService.findAll();
+            model.addAttribute("products", products);
+        }
 
         return "administrator/home";
     }
@@ -58,28 +65,6 @@ public class AdministratorController {
 
     @GetMapping("/orders")
     public String orders(Model model){
-
-        /*
-        List<Order> orders = orderService.findAll();
-
-        SimpleDateFormat dayFormat = new SimpleDateFormat("dd/MM/yyyy");
-
-
-        List <Order> ordersFormatted = orders.stream()
-                        .map( order -> {
-                            Order orderCopy = new Order();
-                            orderCopy.setId(order.getId());
-                            orderCopy.setNumber(order.getNumber());
-                            orderCopy.setCreationDate(new Date(dayFormat.format(order.getCreationDate())));
-                            orderCopy.setReceptionDate(order.getReceptionDate());
-                            orderCopy.setTotal(order.getTotal());
-                            return orderCopy;
-                        })
-                        .collect(Collectors.toList());
-
-         finally decide to manage date format with thymeleaf
-
-         */
 
         model.addAttribute("orders", orderService.findAll());
 
@@ -114,11 +99,20 @@ public class AdministratorController {
             orderService.save(order);
         }
 
-
         return "redirect:/administrator/orders";
     }
 
+    @PostMapping("/search")
+    public String searchProduct(@RequestParam String productName, Model model){
+        LOGG.info("Product name: {}", productName);
 
+        List<Product> products = productService.findAll().stream()
+                .filter(p -> p.getName().toLowerCase().contains(productName.toLowerCase())).collect(Collectors.toList());
+
+        model.addAttribute("products", products);
+
+        return "redirect:/administrator?productName=" + productName;
+    }
 
     private final Logger LOGG = LoggerFactory.getLogger(AdministratorController.class);
 
