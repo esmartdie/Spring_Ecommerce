@@ -146,7 +146,12 @@ public class HomeController {
             model.addAttribute("availableQuantitiesForCart", availableQuantitiesForCart);
         }
 
-        return "user/cart";
+        if(details.size()==0) {
+            return "redirect:/getCart";
+        }else{
+            return "user/cart";
+        }
+
     }
 
     @GetMapping("/getCart")
@@ -154,17 +159,21 @@ public class HomeController {
 
         List<OrderDetail> details = (List<OrderDetail>) session.getAttribute("cart");
 
-        Map<Integer, Integer> availableQuantitiesForCart = new HashMap<>();
-        for (OrderDetail orderDetail : details) {
-            Integer keyValueIdProduct = orderDetail.getProduct().getId();
-            Integer productFinalQuantity = productInventoryService.findLastProduct(orderDetail.getProduct()).getFinalQuantity();
-            availableQuantitiesForCart.put(keyValueIdProduct, productFinalQuantity);
+        boolean isEmptyCart = details == null || details.isEmpty();
+        if (isEmptyCart) {
+            model.addAttribute("isEmptyCart", true);
+        }else{
+            Map<Integer, Integer> availableQuantitiesForCart = new HashMap<>();
+            for (OrderDetail orderDetail : details) {
+                Integer keyValueIdProduct = orderDetail.getProduct().getId();
+                Integer productFinalQuantity = productInventoryService.findLastProduct(orderDetail.getProduct()).getFinalQuantity();
+                availableQuantitiesForCart.put(keyValueIdProduct, productFinalQuantity);
+            }
+            model.addAttribute("availableQuantitiesForCart", availableQuantitiesForCart);
         }
-
         model.addAttribute("cart", details);
         model.addAttribute("order", order);
         model.addAttribute("session", session.getAttribute("userId"));
-        model.addAttribute("availableQuantitiesForCart", availableQuantitiesForCart);
 
         return "/user/cart";
     }
