@@ -94,6 +94,9 @@ public class UserController {
     public String closeSession(HttpSession session){
 
         session.removeAttribute("userId");
+        session.removeAttribute("totalSum");
+        session.removeAttribute("cart");
+        session.removeAttribute("SPRING_SECURITY_CONTEXT");
         return "redirect:/";
     }
 

@@ -2,7 +2,6 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="">
@@ -10,38 +9,31 @@
 
   <title>Spring eCommerce</title>
 
-
   <!-- Bootstrap core CSS -->
   <link th:href="@{/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
 
   <!-- Custom styles for this template -->
   <link th:href="@{/css/heroic-features.css}" rel="stylesheet">
-
 </head>
 
 <body>
-
 <!-- Navigation -->
 <div th:insert="~{user/template_user.html::header}" th:if="${session==null}"></div>
-
 <div th:insert="~{user/template_user.html::header-user}" th:unless="${session==null}"></div>
 
 <!-- Page Content -->
 <div class="container">
-
-
   <!-- Page Heading/Breadcrumbs -->
   <h1 class="mt-4 mb-3">
     Spring eCommerce <small>Cart</small>
   </h1>
-
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
     <li class="breadcrumb-item active">Cart</li>
   </ol>
 
   <!-- Blog Post -->
-  <form th:action="@{/cart}" method="post">
+  <form id="update-cart-form" method="post">
     <div class="row">
       <div class="col-lg-9">
         <table class="table">
@@ -54,45 +46,40 @@
             <th scope="col">Action</th>
           </tr>
           </thead>
-            <tbody>
-            <tr th:each="product, iterStat : ${cart}">
-                <td th:text="${product.name}"></td>
-                <td th:text="${product.price}"></td>
-                <td>
-                    <!-- Usa el iterStat.index como parte del identificador único -->
-                    <input type="hidden" name="productIds" th:value="${product.product.id}">
-                    <input type="number"
-                           th:name="'quantities-' + ${product.product.id}"
-                           autocomplete="off"
-                           min="1"
-                           th:if="${availableQuantitiesForCart.containsKey(product.product.id)}"
-                           th:max="${availableQuantitiesForCart.get(product.product.id)}"
-                           th:value="${product.quantity}">
-                </td>
-                <td th:text="${product.total}"></td>
-                <td>
-                    <a th:href="@{'/delete/cart/' + ${product.product.id}}" class="btn btn-danger">Remove</a>
-                </td>
-            </tr>
-            </tbody>
+          <tbody>
+          <tr th:each="product, iterStat : ${cart}">
+            <td th:text="${product.name}"></td>
+            <td th:text="${product.price}"></td>
+            <td>
+              <!-- Usa el iterStat.index como parte del identificador único -->
+              <input type="hidden" name="productIds" th:value="${product.product.id}">
+              <input type="number" th:name="'quantities-' + ${product.product.id}" autocomplete="off" min="1"
+                     th:if="${availableQuantitiesForCart.containsKey(product.product.id)}"
+                     th:max="${availableQuantitiesForCart.get(product.product.id)}" th:value="${product.quantity}">
+            </td>
+            <td th:text="${product.total}"></td>
+            <td>
+              <a th:href="@{'/delete/cart/' + ${product.product.id}}" class="btn btn-danger">Remove</a>
+            </td>
+          </tr>
+          </tbody>
         </table>
       </div>
 
       <div class="col-lg-3">
         <h2 class="card-title">SUBTOTAL</h2>
-
         <ul class="list-group">
           <li class="list-group-item"><h5 th:text="${order.total}"></h5></li>
-          <a th:href="@{/order}" class="btn btn-dark">View Order</a>
+          <!-- Botón para ver el pedido -->
+          <button type="button" class="btn btn-dark" onclick="viewOrder()">View Order</button>
+          <!-- Botón para actualizar el carrito -->
+          <button type="button" class="btn btn-primary" onclick="updateCart()">Update Products</button>
         </ul>
       </div>
     </div>
-    <!--<button type="submit" class="btn btn-primary">Update All</button>-->
   </form>
-
-
-
 </div>
+
 <div>
   <br>
   <br>
@@ -101,16 +88,25 @@
   <br>
   <br>
 </div>
+<!-- /.container -->
 
-  <!-- /.container -->
+<!-- Footer -->
+<div th:insert="~{user/template_user.html::footer}"></div>
 
-  <!-- Footer -->
-  <div th:insert=~{user/template_user.html::footer}></div>
+<!-- Bootstrap core JavaScript -->
+<script th:src="@{/vendor/jquery/jquery.min.js}"></script>
+<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
 
-  <!-- Bootstrap core JavaScript -->
-  <script th:src="@{/vendor/jquery/jquery.min.js}"></script>
-  <script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script type="text/javascript">
+  function updateCart() {
+    // Envía los datos del formulario al controlador /update/cart
+    $('#update-cart-form').attr('action', '/update/cart').submit();
+  }
 
+  function viewOrder() {
+    // Envía los datos del formulario al controlador /order
+    $('#update-cart-form').attr('action', '/order').submit();
+  }
+</script>
 </body>
-
 </html>

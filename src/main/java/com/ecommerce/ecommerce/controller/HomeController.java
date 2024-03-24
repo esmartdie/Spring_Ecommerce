@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -170,22 +171,46 @@ public class HomeController {
         return "/user/cart";
     }
 
-    /*
-    @PostMapping("/updateQuantity")
-    public String updateQuantity(@RequestParam Map<String, String> quantitiesMap, Model model, HttpSession session) {
+    @PostMapping("/update/cart")
+    public String updateCart(@RequestParam MultiValueMap<String, String> quantitiesMap,
+                             @RequestParam(value = "productIds", required = false) List<Integer> productIds,
+                             HttpSession session, Model model) {
+        List<OrderDetail> cart = (List<OrderDetail>) session.getAttribute("cart");
 
-        for (Map.Entry<String, String> entry : quantitiesMap.entrySet()) {
-            Integer productId = Integer.parseInt(entry.getKey().substring("quantities-".length()));
-            Integer quantity = Integer.parseInt(entry.getValue());
-            // Aquí puedes realizar las acciones necesarias para actualizar la cantidad en la sesión o en la base de datos
+        if (cart != null && productIds != null) {
+            for (Integer productId : productIds) {
+                String inputName = "quantities-" + productId;
+                List<String> quantities = quantitiesMap.get(inputName);
+                if (quantities != null && !quantities.isEmpty()) {
+                    String quantityStr = quantities.get(0);
+                    Integer quantity = Integer.parseInt(quantityStr);
+                    for (OrderDetail detail : cart) {
+                        if (detail.getProduct().getId().equals(productId)) {
+                            detail.setQuantity(quantity);
+                            detail.setTotal(detail.getPrice() * quantity);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Actualizar el total del pedido si es necesario
+            double totalSum = cart.stream().mapToDouble(detail -> detail.getPrice() * detail.getQuantity()).sum();
+            order.setTotal(totalSum);
+            session.setAttribute("totalSum", totalSum);
+            model.addAttribute("order", order);
+
         }
-        // Resto de la lógica del controlador
-        return "user/cart";
+
+        // Actualizar la información en la sesión
+        session.setAttribute("cart", cart);
+
+        // Redirigir al usuario de nuevo a la página del carrito
+        return "redirect:/getCart";
     }
 
-     */
 
-    @GetMapping("/order")
+    @PostMapping("/order")
     public String order(Model model, HttpSession session) {
 
         Object userIdAttribute = session.getAttribute("userId");
@@ -196,12 +221,24 @@ public class HomeController {
 
                 Optional<User> userOp = userService.findById(userId);
 
-                User user = userOp.get();
-                model.addAttribute("cart", details);
-                model.addAttribute("order", order);
-                model.addAttribute("user", user);
+                if (userOp.isPresent()) {
+                    User user = userOp.get();
 
-                return "user/ordersummary";
+                    // Aquí inicializa los detalles del pedido y el objeto de pedido
+                    List<OrderDetail> details = (List<OrderDetail>) session.getAttribute("cart");
+                    double totalSum = (double)session.getAttribute("totalSum");
+                    Order order = new Order(); // Asegúrate de tener una instancia válida de Order
+
+                    model.addAttribute("cart", details);
+                    model.addAttribute("order", order);
+                    model.addAttribute("user", user);
+                    model.addAttribute("totalSum", totalSum);
+
+                    return "user/ordersummary";
+                } else {
+                    // Manejar el caso donde el usuario no se encuentra
+                    return "redirect:/user/login";
+                }
 
             } catch (NumberFormatException e) {
                 return "redirect:/user/login";
@@ -228,6 +265,8 @@ public class HomeController {
 
         orderService.save(order);
 
+        List<OrderDetail> details = (List<OrderDetail>) session.getAttribute("cart");
+
         for (OrderDetail od:details){
             od.setOrder(order);
             orderDetailService.save(od);
@@ -239,6 +278,8 @@ public class HomeController {
 
         order = new Order();
         details.clear();
+        session.removeAttribute("cart");
+        session.removeAttribute("sumTotal");
 
         return url;
 
