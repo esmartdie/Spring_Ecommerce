@@ -49,14 +49,16 @@ public class HomeController {
         return "/user/product_home.html";
     }
 
-
-
     @PostMapping("/cart")
     public String addCart(@RequestParam Integer id, @RequestParam Integer quantity, Model model, HttpSession session) {
 
+        Object userIdObject = session.getAttribute("userId");
+        if (userIdObject == null) {
+            return "redirect:/user/login";
+        }
+
         Optional<Product> optionalProduct = productService.getProduct(id);
-        if (!optionalProduct.isPresent()) {
-            // Handle case where product is not found
+        if (optionalProduct.isEmpty()) {
             return "redirect:/producthome/" + id;
         }
 
@@ -80,15 +82,12 @@ public class HomeController {
             return "redirect:/producthome/" + id;
         }
 
-        // Proceed with adding the product to the cart
-        // Check if the product already exists in the cart
         OrderDetail existingOrderDetail = details.stream()
                 .filter(detail -> detail.getProduct().getId().equals(product.getId()))
                 .findFirst()
                 .orElse(null);
 
         if (existingOrderDetail != null) {
-            // Update the quantity of existing product in the cart
             existingOrderDetail.setQuantity(existingOrderDetail.getQuantity() + quantity);
             existingOrderDetail.setTotal(existingOrderDetail.getQuantity()*existingOrderDetail.getPrice());
         } else {
@@ -112,7 +111,6 @@ public class HomeController {
         double totalSum = details.stream().mapToDouble(OrderDetail::getTotal).sum();
         order.setTotal(totalSum);
 
-        // Pass the available quantity for each product to the view
         model.addAttribute("availableQuantitiesForCart", availableQuantitiesForCart);
         model.addAttribute("cart", details);
         model.addAttribute("order", order);
@@ -175,6 +173,7 @@ public class HomeController {
     public String updateCart(@RequestParam MultiValueMap<String, String> quantitiesMap,
                              @RequestParam(value = "productIds", required = false) List<Integer> productIds,
                              HttpSession session, Model model) {
+
         List<OrderDetail> cart = (List<OrderDetail>) session.getAttribute("cart");
 
         if (cart != null && productIds != null) {
@@ -183,7 +182,14 @@ public class HomeController {
                 List<String> quantities = quantitiesMap.get(inputName);
                 if (quantities != null && !quantities.isEmpty()) {
                     String quantityStr = quantities.get(0);
-                    Integer quantity = Integer.parseInt(quantityStr);
+                    int dotIndex = quantityStr.indexOf('.');
+                    String integerPart;
+                    if (dotIndex != -1) {
+                        integerPart = quantityStr.substring(0, dotIndex);
+                    } else {
+                        integerPart = quantityStr;
+                    }
+                    Integer quantity = Integer.parseInt(integerPart);
                     for (OrderDetail detail : cart) {
                         if (detail.getProduct().getId().equals(productId)) {
                             detail.setQuantity(quantity);
@@ -194,7 +200,6 @@ public class HomeController {
                 }
             }
 
-            // Actualizar el total del pedido si es necesario
             double totalSum = cart.stream().mapToDouble(detail -> detail.getPrice() * detail.getQuantity()).sum();
             order.setTotal(totalSum);
             session.setAttribute("totalSum", totalSum);
@@ -202,10 +207,8 @@ public class HomeController {
 
         }
 
-        // Actualizar la información en la sesión
         session.setAttribute("cart", cart);
 
-        // Redirigir al usuario de nuevo a la página del carrito
         return "redirect:/getCart";
     }
 
