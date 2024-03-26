@@ -236,19 +236,19 @@ public class HomeController {
                 if (userOp.isPresent()) {
                     User user = userOp.get();
 
-                    // Aquí inicializa los detalles del pedido y el objeto de pedido
+
                     List<OrderDetail> details = (List<OrderDetail>) session.getAttribute("cart");
-                    double totalSum = (double)session.getAttribute("totalSum");
-                    Order order = new Order(); // Asegúrate de tener una instancia válida de Order
+                    //double totalSum = (double)session.getAttribute("totalSum");
+                    //Order order = new Order(); // Asegúrate de tener una instancia válida de Order
 
                     model.addAttribute("cart", details);
                     model.addAttribute("order", order);
                     model.addAttribute("user", user);
-                    model.addAttribute("totalSum", totalSum);
+                    model.addAttribute("totalSum", order.getTotal());
 
                     return "user/ordersummary";
                 } else {
-                    // Manejar el caso donde el usuario no se encuentra
+
                     return "redirect:/user/login";
                 }
 
