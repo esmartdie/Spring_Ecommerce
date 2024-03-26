@@ -39,6 +39,14 @@ public class ProductServiceImpl implements IProductService {
         return productRepository.findAll();
     }
 
+    @Override
+    public List<Product> findAllInactiveProducts() {
+        return productRepository.findAllInactiveProducts();
+    }
 
+    @Override
+    public List<Product> findAllActiveProducts() {
+        return productRepository.findAllActiveProducts();
+    }
 
 }

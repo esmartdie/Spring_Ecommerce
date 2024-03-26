@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping("/products")
@@ -27,7 +24,7 @@ public class ProductController {
 
     @GetMapping("")
     public String show(Model model){
-        model.addAttribute("products", IProductService.findAll());
+        model.addAttribute("products", ProductService.findAllActiveProducts());
         return "products/show";
     }
 
@@ -46,7 +43,7 @@ public class ProductController {
             String imageName= upload.saveImage(file);
             product.setImage(imageName);
         }
-        IProductService.save(product);
+        ProductService.save(product);
 
         createProductInventoryLog(product);
 
@@ -70,7 +67,7 @@ public class ProductController {
     @GetMapping("/edit/{id}")
     public String edit(@PathVariable Integer id, Model model){
         Product product = new Product();
-        Optional<Product> optionalProduct= IProductService.getProduct(id);
+        Optional<Product> optionalProduct= ProductService.getProduct(id);
         product=optionalProduct.get();
 
         LOGGER.info("Searched product: {}", product);
@@ -80,9 +77,10 @@ public class ProductController {
     }
 
     @PostMapping("/update")
-    public String update(Product product, @RequestParam("img") MultipartFile file) throws IOException {
+    public String update(Product product, @RequestParam("img") MultipartFile file, HttpSession session) throws IOException {
         Product p = new Product();
-        p= IProductService.getProduct(product.getId()).get();
+        p= ProductService.getProduct(product.getId()).get();
+        product.setActive(p.getActive());
         if(file.isEmpty()){
             product.setImage(p.getImage());
         }else{
@@ -94,8 +92,18 @@ public class ProductController {
             product.setImage(imageName);
         }
         product.setUser(p.getUser());
-        IProductService.update(product);
 
+        if(product.getQuantity()==0 && !p.getActive()){
+            session.setAttribute("activeProduct", product.getId());
+            return "redirect:/products/inactive";
+        }else if(product.getQuantity()>0 && !p.getActive()){
+            product.setActive(true);
+            ProductService.update(product);
+            updateProductInventoryFinalExistence(product);
+            return "redirect:/products";
+        }
+
+        ProductService.update(product);
         updateProductInventoryFinalExistence(product);
         return "redirect:/products";
     }
@@ -128,20 +136,18 @@ public class ProductController {
 
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable Integer id){
-        Product p = new Product();
-        p= IProductService.getProduct(id).get();
+        Product product = ProductService.getProduct(id).orElse(null);
 
-        if(!p.getImage().equals("default.jpg")){
-            upload.deleteImage(p.getImage());
+        if (product != null) {
+            product.setActive(false);
+            ProductService.update(product);
+            createDeletedProductInventoryLog(product);
         }
-
-        deleteProductInventory(p);
-        IProductService.delete(id);
 
         return "redirect:/products";
     }
 
-    private void deleteProductInventory(Product product){
+    private void createDeletedProductInventoryLog(Product product){
 
         List<ProductInventory> productInventoryList = productInventoryService.findByProduct(product);
 
@@ -153,6 +159,8 @@ public class ProductController {
 
             int finalExistence = latestInventory.getFinalQuantity();
 
+            ProductInventory pI = new ProductInventory();
+
             pI.setDate(logDate);
             pI.setOperationName("Admin delete product by GUI");
             pI.setInitialQuantity(finalExistence);
@@ -163,16 +171,49 @@ public class ProductController {
             productInventoryService.save(pI);
 
         }
+    }
+    @GetMapping("/inactive")
+    public String showInactive(Model model, HttpSession session){
 
-        pI = new ProductInventory();
+        Integer activeProductId = (Integer) session.getAttribute("activeProduct");
+        List<Product> inactiveProducts = ProductService.findAllInactiveProducts();
+        model.addAttribute("products", ProductService.findAllInactiveProducts());
+        String message = "To active the product, the quantity must be higher than 0";
+
+        Map<Integer, String> messages = new HashMap<>();
+        for(Product product : inactiveProducts) {
+            if (product.getId().equals(activeProductId)) {
+                messages.put(product.getId(), message);
+            } else {
+                messages.put(product.getId(), "");
+            }
+        }
+        model.addAttribute("messages", messages);
+        return "products/inactive";
     }
 
+    @GetMapping("/active/{id}")
+    public String active(@PathVariable Integer id, Model model){
+        Product product = new Product();
+        Optional<Product> optionalProduct= ProductService.getProduct(id);
+        product=optionalProduct.get();
+
+        if(product.getQuantity()>0){
+            product.setActive(true);
+            ProductService.update(product);
+        }else{
+            LOGGER.info("Searched product: {}", product);
+            model.addAttribute("product", product);
+            return "products/edit";
+        }
+        return "redirect:/products/inactive";
+    }
 
     private ProductInventory pI = new ProductInventory();
     private Date logDate = new Date();
     private final Logger LOGGER = LoggerFactory.getLogger(ProductController.class);
     @Autowired
-    private IProductService IProductService;
+    private IProductService ProductService;
     @Autowired
     private UploadFileService upload;
     @Autowired

@@ -26,7 +26,7 @@ public class HomeController {
     public String home(Model model, HttpSession session){
 
         LOG.info("User session: {}", session.getAttribute("userId"));
-        model.addAttribute("products", productService.findAll());
+        model.addAttribute("products", productService.findAllActiveProducts());
 
         model.addAttribute("session", session.getAttribute("userId"));
 
@@ -329,7 +329,7 @@ public class HomeController {
     public String searchProduct(@RequestParam String productName, Model model){
         LOG.info("Product name: {}", productName);
 
-        List<Product> products = productService.findAll().stream()
+        List<Product> products = productService.findAllActiveProducts().stream()
                 .filter(p -> p.getName().toLowerCase().contains(productName.toLowerCase())).collect(Collectors.toList());
 
         model.addAttribute("products", products);

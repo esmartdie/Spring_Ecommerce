@@ -7,10 +7,11 @@ import java.util.Optional;
 
 public interface IProductService {
 
-    public Product save(Product product);
-    public Optional<Product> getProduct (Integer id);
-    public void update(Product product);
-    public void delete(Integer id);
-    public List<Product> findAll();
-
+    Product save(Product product);
+    Optional<Product> getProduct (Integer id);
+    void update(Product product);
+    void delete(Integer id);
+    List<Product> findAll();
+    List<Product> findAllInactiveProducts();
+    List<Product> findAllActiveProducts();
 }

@@ -97,6 +97,7 @@ public class UserController {
         session.removeAttribute("totalSum");
         session.removeAttribute("cart");
         session.removeAttribute("SPRING_SECURITY_CONTEXT");
+        session.removeAttribute("activeProduct");
         return "redirect:/";
     }
 

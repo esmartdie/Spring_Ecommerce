@@ -27,13 +27,13 @@ public class AdministratorController {
     public String home(@RequestParam(required = false) String productName, Model model){
         if (productName != null && !productName.isEmpty()) {
 
-            List<Product> products = productService.findAll().stream()
+            List<Product> products = productService.findAllActiveProducts().stream()
                     .filter(p -> p.getName().toLowerCase().contains(productName.toLowerCase()))
                     .collect(Collectors.toList());
             model.addAttribute("products", products);
         } else {
 
-            List<Product> products = productService.findAll();
+            List<Product> products = productService.findAllActiveProducts();
             model.addAttribute("products", products);
         }
 
@@ -106,7 +106,7 @@ public class AdministratorController {
     public String searchProduct(@RequestParam String productName, Model model){
         LOGG.info("Product name: {}", productName);
 
-        List<Product> products = productService.findAll().stream()
+        List<Product> products = productService.findAllActiveProducts().stream()
                 .filter(p -> p.getName().toLowerCase().contains(productName.toLowerCase())).collect(Collectors.toList());
 
         model.addAttribute("products", products);

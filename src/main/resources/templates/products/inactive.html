@@ -12,10 +12,10 @@
 
 
   <!-- Bootstrap core CSS -->
-  <link th:href="@{vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+  <link th:href="@{/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
 
   <!-- Custom styles for this template -->
-  <link th:href="@{css/heroic-features.css}" rel="stylesheet">
+  <link th:href="@{/css/heroic-features.css}" rel="stylesheet">
 
 </head>
 
@@ -31,19 +31,15 @@
 
   <!-- Page Heading/Breadcrumbs -->
   <h1 class="mt-4 mb-3">
-    Spring eCommerce <small>Products</small>
+    Spring eCommerce <small>Inactive Products</small>
   </h1>
 
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a th:href="@{/administrator}">Home</a></li>
-    <li class="breadcrumb-item active">Products</li>
+    <li class="breadcrumb-item active"><a th:href="@{/products}">Products</a></li>
+    <li class="breadcrumb-item active">Inactive Products</li>
   </ol>
 
-  <a class="btn btn-primary" th:href="@{/products/create}">New Product</a>
-  <a class="btn btn-secondary" th:href="@{/products/inactive}">Show Inactive Products</a>
-  <div>
-    <br>
-  </div>
   <h2>Products</h2>
   <table class="table">
     <thead>
@@ -53,18 +49,20 @@
         <th scope="col">Quantity</th>
         <th scope="col">Price</th>
         <th scope="col">Action</th>
-        <th scope="col">Action</th>
+        <th scope="col">Comment</th>
       </tr>
     </thead>
     <tbody>
-      <tr th:each="product:${products}">
+      <tr th:each="product : ${products}">
         <td th:text="${product.name}"></td>
         <td th:text="${product.description}"></td>
         <td th:text="${product.quantity}"></td>
         <td th:text="${product.price}"></td>
-        <td><a  class="btn btn-warning" th:href="@{products/edit/{id} (id=${product.id})}">Edit</a> </td>
-        <td><a  class="btn btn-danger" th:href="@{products/delete/{id} (id=${product.id})}">Remove</a> </td>
-      </tr>       
+        <td><a  class="btn btn-warning" th:href="@{/products/active/{id} (id=${product.id})}">Active</a> </td>
+        <td>
+          <textarea th:text="${messages[product.id]}" readonly></textarea>
+        </td>
+      </tr>
     </tbody>
   </table>
 
@@ -75,8 +73,8 @@
   <div th:insert="~{administrator/template_admin.html::footer}"></div>
 
 <!-- Bootstrap core JavaScript -->
-  <script th:src="@{vendor/jquery/jquery.min.js}"></script>
-  <script th:src="@{vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+  <script th:src="@{/vendor/jquery/jquery.min.js}"></script>
+  <script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
 
 </body>
 
