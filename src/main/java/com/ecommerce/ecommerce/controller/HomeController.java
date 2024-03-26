@@ -283,6 +283,8 @@ public class HomeController {
             od.setOrder(order);
             orderDetailService.save(od);
             createProductInventoryLog(od,order, creationDate);
+            if(od.getProduct().getQuantity()==0)
+                od.getProduct().setActive(false);
         }
 
         String url= "redirect:/user/details/"+order.getId();
