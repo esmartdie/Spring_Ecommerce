@@ -114,15 +114,15 @@ public class ProductController {
 
         if (!productInventoryList.isEmpty()) {
 
-            productInventoryList.sort(Comparator.comparing(ProductInventory::getDate).reversed());
+            productInventoryList.sort(Comparator.comparing(ProductInventory::getId).reversed());
 
             ProductInventory latestInventory = productInventoryList.get(0);
 
-            int finalExistence = latestInventory.getFinalQuantity();
+            int initialExistence = latestInventory.getFinalQuantity();
 
             pI.setDate(logDate);
             pI.setOperationName("Admin update final quantity by GUI");
-            pI.setInitialQuantity(finalExistence);
+            pI.setInitialQuantity(initialExistence);
             pI.setFinalQuantity(product.getQuantity());
             pI.setOperationQuantity(pI.getFinalQuantity() - pI.getInitialQuantity());
             pI.setProduct(product);
@@ -141,12 +141,12 @@ public class ProductController {
         if (product != null) {
             product.setActive(false);
             ProductService.update(product);
-            createDeletedProductInventoryLog(product);
+            //createDeletedProductInventoryLog(product);
         }
 
         return "redirect:/products";
     }
-
+/*
     private void createDeletedProductInventoryLog(Product product){
 
         List<ProductInventory> productInventoryList = productInventoryService.findByProduct(product);
@@ -172,6 +172,8 @@ public class ProductController {
 
         }
     }
+
+ */
     @GetMapping("/inactive")
     public String showInactive(Model model, HttpSession session){
 

@@ -283,8 +283,10 @@ public class HomeController {
             od.setOrder(order);
             orderDetailService.save(od);
             createProductInventoryLog(od,order, creationDate);
-            if(od.getProduct().getQuantity()==0)
+            if(od.getProduct().getQuantity()==0){
                 od.getProduct().setActive(false);
+                productService.update(od.getProduct());
+            }
         }
 
         String url= "redirect:/user/details/"+order.getId();
@@ -307,16 +309,16 @@ public class HomeController {
 
         if (!productInventoryList.isEmpty()) {
 
-            productInventoryList.sort(Comparator.comparing(ProductInventory::getDate).reversed());
+            productInventoryList.sort(Comparator.comparing(ProductInventory::getId).reversed());
 
             ProductInventory latestInventory = productInventoryList.get(0);
 
-            int finalExistence = latestInventory.getFinalQuantity();
+            int initialExistence = latestInventory.getFinalQuantity();
 
             ProductInventory pI = new ProductInventory();
             pI.setDate(logDate);
             pI.setOperationName("Order created: "+order.getNumber());
-            pI.setInitialQuantity(finalExistence);
+            pI.setInitialQuantity(initialExistence);
             pI.setOperationQuantity((int) od.getQuantity());
             pI.setFinalQuantity(pI.getInitialQuantity()-pI.getOperationQuantity());
             pI.setProduct(product);
@@ -324,7 +326,10 @@ public class HomeController {
 
             productInventoryService.save(pI);
 
+            product.setQuantity(pI.getFinalQuantity());
+            productService.update(product);
         }
+
     }
 
     @PostMapping("/search")

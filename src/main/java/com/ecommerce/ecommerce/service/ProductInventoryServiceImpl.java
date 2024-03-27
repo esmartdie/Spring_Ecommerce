@@ -36,7 +36,7 @@ public class ProductInventoryServiceImpl implements IProductInventoryService{
 
         List<ProductInventory> productInventoryList = productInventoryRepository.findByProduct(product);
 
-        productInventoryList.sort(Comparator.comparing(ProductInventory::getDate).reversed());
+        productInventoryList.sort(Comparator.comparing(ProductInventory::getId).reversed());
 
         return productInventoryList.get(0);
 
