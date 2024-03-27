@@ -52,7 +52,7 @@
   </div>
 
   <div th:unless="${isEmptyCart}">
-    <form id="update-cart-form" method="post">
+    <form id="update-cart-form" method="post" onsubmit="return quantityValidator();">
       <div class="row">
         <div class="col-lg-9">
           <table class="table">
@@ -72,7 +72,7 @@
               <td>
                 <!-- Usa el iterStat.index como parte del identificador único -->
                 <input type="hidden" name="productIds" th:value="${product.product.id}">
-                <input type="number" th:name="'quantities-' + ${product.product.id}" autocomplete="off" min="1"
+                <input type="number" id="quantity" th:name="'quantities-' + ${product.product.id}" autocomplete="off" min="1"
                        th:if="${availableQuantitiesForCart.containsKey(product.product.id)}"
                        th:max="${availableQuantitiesForCart.get(product.product.id)}" th:value="${product.quantity}">
               </td>
@@ -128,6 +128,14 @@
   function viewOrder() {
     // Envía los datos del formulario al controlador /order
     $('#update-cart-form').attr('action', '/order').submit();
+  }
+    function quantityValidator() {
+      var quantity = document.getElementById("quantity").value;
+      if (quantity === "") {
+          alert("The field quantity it's mandatory");
+          return false;
+      }
+      return true;
   }
 </script>
 </body>

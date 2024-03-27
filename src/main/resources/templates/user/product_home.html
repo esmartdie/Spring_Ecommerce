@@ -48,7 +48,7 @@
               </a>
             </div>
             <div class="col-lg-6">
-              <form th:action="@{/cart}" method="POST">
+              <form th:action="@{/cart}" method="POST" onsubmit="return quantityValidator();">
                 <input type="hidden" th:value="${product.id}" name="id">
                 <h2 class="card-title" th:text="${product.name}"></h2>
 
@@ -99,7 +99,16 @@
       });
   });
 </script>
-
+<script>
+  function quantityValidator() {
+      var quantity = document.getElementById("quantity").value;
+      if (quantity === "") {
+          alert("The field quantity it's mandatory");
+          return false;
+      }
+      return true;
+  }
+</script>
 
   </body>
 

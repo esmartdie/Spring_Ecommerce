@@ -72,12 +72,7 @@ public class HomeController {
 
         Integer availableQuantity = productInventoryService.findLastProduct(product).getFinalQuantity();
 
-        if (availableQuantity == null) {
-            // Handle case where available quantity is not found
-            return "redirect:/producthome/" + id;
-        }
-
-        if (quantity > availableQuantity) {
+        if (quantity > availableQuantity ) {
             model.addAttribute("error", "Not enough available units to complete the purchase");
             return "redirect:/producthome/" + id;
         }
@@ -199,6 +194,8 @@ public class HomeController {
                         integerPart = quantityStr;
                     }
                     Integer quantity = Integer.parseInt(integerPart);
+                    if(quantity > productService.getProduct(productId).get().getQuantity())
+                        quantity=productService.getProduct(productId).get().getQuantity();
                     for (OrderDetail detail : cart) {
                         if (detail.getProduct().getId().equals(productId)) {
                             detail.setQuantity(quantity);
