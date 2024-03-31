@@ -23,111 +23,88 @@ import java.util.stream.Collectors;
 @RequestMapping("/administrator")
 public class AdministratorController {
 
-    @GetMapping("")
-    public String home(@RequestParam(required = false) String productName, Model model){
-        if (productName != null && !productName.isEmpty()) {
+    private final Logger logger = LoggerFactory.getLogger(AdministratorController.class);
 
-            List<Product> products = productService.findAllActiveProducts().stream()
+    private final IProductService productService;
+    private final IUserService userService;
+    private final IOrderService orderService;
+    private final IOrderStatusService orderStatusService;
+    private final IProductInventoryService productInventoryService;
+
+    @Autowired
+    public AdministratorController(IProductService productService, IUserService userService,
+                                   IOrderService orderService, IOrderStatusService orderStatusService,
+                                   IProductInventoryService productInventoryService) {
+        this.productService = productService;
+        this.userService = userService;
+        this.orderService = orderService;
+        this.orderStatusService = orderStatusService;
+        this.productInventoryService = productInventoryService;
+    }
+
+    @GetMapping("")
+    public String home(@RequestParam(required = false) String productName, Model model) {
+        List<Product> products = productService.findAllActiveProducts();
+        if (productName != null && !productName.isEmpty()) {
+            products = products.stream()
                     .filter(p -> p.getName().toLowerCase().contains(productName.toLowerCase()))
                     .collect(Collectors.toList());
-            model.addAttribute("products", products);
-        } else {
-
-            List<Product> products = productService.findAllActiveProducts();
-            model.addAttribute("products", products);
         }
-
+        model.addAttribute("products", products);
         return "administrator/home";
     }
 
     @GetMapping("/users")
     public String users(Model model){
-
         model.addAttribute("users", userService.findAll());
         return "administrator/users";
     }
 
     @GetMapping("/producthomeadmin/{id}")
-    public String productHome(@PathVariable Integer id, Model model){
-        LOGG.info("Product Id sent as argument {}", id);
-
-        Product product = new Product();
-        Optional<Product> optionalProduct = productService.getProduct(id);
-        product = optionalProduct.get();
-
+    public String productHome(@PathVariable Integer id, Model model) {
+        logger.info("Product Id sent as argument {}", id);
+        Product product = productService.getProduct(id).orElseThrow(() -> new RuntimeException("Product not found"));
         ProductInventory latestInventory = productInventoryService.findLastProduct(product);
-
         model.addAttribute("inventory", latestInventory);
         model.addAttribute("product", product);
-
         return "administrator/product_home";
     }
 
     @GetMapping("/orders")
-    public String orders(Model model){
-
+    public String orders(Model model) {
         model.addAttribute("orders", orderService.findAll());
-
         return "administrator/orders";
     }
 
     @GetMapping("/details/{id}")
-    public String details(Model model, @PathVariable Integer id){
-
-        LOGG.info("Order id: {}", id);
-
-        Order order = orderService.findById(id).get();
-
+    public String details(Model model, @PathVariable Integer id) {
+        logger.info("Order id: {}", id);
+        Order order = orderService.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
         List<OrderStatus> orderStatusList = orderStatusService.findAll();
-
         model.addAttribute("orderStatusList", orderStatusList);
         model.addAttribute("order", order);
         model.addAttribute("orderdetails", order.getDetails());
-
         return "administrator/shoppingdetails";
     }
 
     @PostMapping("/updateOrderStatus")
     public String updateOrderStatus(@RequestParam("orderId") Integer orderId,
                                     @RequestParam("newStatus") String newStatus) {
-
-        Order order = orderService.findById(orderId).orElse(null);
-
-        if (order != null) {
-            OrderStatus status = orderStatusService.findByStatus(newStatus);
-            order.setStatus(status);
-            orderService.save(order);
-        }
-
+        Order order = orderService.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        OrderStatus status = orderStatusService.findByStatus(newStatus);
+        order.setStatus(status);
+        orderService.save(order);
         return "redirect:/administrator/orders";
     }
 
     @PostMapping("/search")
-    public String searchProduct(@RequestParam String productName, Model model){
-        LOGG.info("Product name: {}", productName);
-
+    public String searchProduct(@RequestParam String productName, Model model) {
+        logger.info("Product name: {}", productName);
         List<Product> products = productService.findAllActiveProducts().stream()
-                .filter(p -> p.getName().toLowerCase().contains(productName.toLowerCase())).collect(Collectors.toList());
-
+                .filter(p -> p.getName().toLowerCase().contains(productName.toLowerCase()))
+                .collect(Collectors.toList());
         model.addAttribute("products", products);
-
-        return "redirect:/administrator?productName=" + productName;
+        return "administrator/home";
     }
 
-    private final Logger LOGG = LoggerFactory.getLogger(AdministratorController.class);
-
-    @Autowired
-    private IProductService productService;
-
-    @Autowired
-    private IUserService userService;
-
-    @Autowired
-    private IOrderService orderService;
-
-    @Autowired
-    private IOrderStatusService orderStatusService;
-
-    @Autowired
-    private IProductInventoryService productInventoryService;
 }

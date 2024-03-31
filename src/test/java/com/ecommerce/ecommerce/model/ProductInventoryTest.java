@@ -1,4 +1,4 @@
-package test.ecommerce.ecommerce.model;
+package com.ecommerce.ecommerce.model;
 
 import com.ecommerce.ecommerce.model.OrderDetail;
 import com.ecommerce.ecommerce.model.Product;
