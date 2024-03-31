@@ -102,6 +102,14 @@ public class Product {
         this.active = active;
     }
 
+    public List<ProductInventory> getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(List<ProductInventory> inventory) {
+        this.inventory = inventory;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

@@ -95,6 +95,14 @@ public class User {
         this.products = products;
     }
 
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -124,4 +132,5 @@ public class User {
     private List<Product> products;
     @OneToMany(mappedBy = "user")
     private List<Order> orders;
+
 }
