@@ -1,9 +1,11 @@
 package com.ecommerce.ecommerce.utils;
 
 import jakarta.servlet.http.HttpSession;
+import org.springframework.stereotype.Component;
 
 import java.util.Enumeration;
 
+@Component
 public class SessionUtils {
 
     public Integer getUserIdFromSession(HttpSession session) {

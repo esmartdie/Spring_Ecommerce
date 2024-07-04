@@ -44,25 +44,11 @@ public class ProductController {
             product.setImage(imageName);
         }
         ProductService.save(product);
-
-        createProductInventoryLog(product);
+        productInventoryService.newProductAddedProductInventoryLog(product, logDate);
 
         return "redirect:/products";
     }
 
-    private void createProductInventoryLog(Product product) {
-        ProductInventory pI = new ProductInventory();
-
-        pI.setDate(logDate);
-        pI.setOperationName("Product Available to Sale");
-        pI.setInitialQuantity(0);
-        pI.setOperationQuantity(product.getQuantity());
-        pI.setFinalQuantity(pI.getInitialQuantity()+ pI.getOperationQuantity());
-        pI.setProduct(product);
-
-        productInventoryService.save(pI);
-
-    }
 
     @GetMapping("/edit/{id}")
     public String edit(@PathVariable Integer id, Model model){
@@ -99,40 +85,15 @@ public class ProductController {
         }else if(product.getQuantity()>0 && !p.getActive()){
             product.setActive(true);
             ProductService.update(product);
-            updateProductInventoryFinalExistence(product);
+            productInventoryService.updateProductInventoryFinalExistence(product, logDate);
             return "redirect:/products";
         }
 
         ProductService.update(product);
-        updateProductInventoryFinalExistence(product);
+        productInventoryService.updateProductInventoryFinalExistence(product, logDate);
         return "redirect:/products";
     }
 
-    private void updateProductInventoryFinalExistence(Product product){
-
-        List<ProductInventory> productInventoryList = productInventoryService.findByProduct(product);
-
-        if (!productInventoryList.isEmpty()) {
-
-            productInventoryList.sort(Comparator.comparing(ProductInventory::getId).reversed());
-
-            ProductInventory latestInventory = productInventoryList.get(0);
-
-            int initialExistence = latestInventory.getFinalQuantity();
-
-            pI.setDate(logDate);
-            pI.setOperationName("Admin update final quantity by GUI");
-            pI.setInitialQuantity(initialExistence);
-            pI.setFinalQuantity(product.getQuantity());
-            pI.setOperationQuantity(pI.getFinalQuantity() - pI.getInitialQuantity());
-            pI.setProduct(product);
-
-            productInventoryService.save(pI);
-
-        }
-
-        pI = new ProductInventory();
-    }
 
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable Integer id){
@@ -146,34 +107,6 @@ public class ProductController {
 
         return "redirect:/products";
     }
-/*
-    private void createDeletedProductInventoryLog(Product product){
-
-        List<ProductInventory> productInventoryList = productInventoryService.findByProduct(product);
-
-        if (!productInventoryList.isEmpty()) {
-
-            productInventoryList.sort(Comparator.comparing(ProductInventory::getDate).reversed());
-
-            ProductInventory latestInventory = productInventoryList.get(0);
-
-            int finalExistence = latestInventory.getFinalQuantity();
-
-            ProductInventory pI = new ProductInventory();
-
-            pI.setDate(logDate);
-            pI.setOperationName("Admin delete product by GUI");
-            pI.setInitialQuantity(finalExistence);
-            pI.setFinalQuantity(0);
-            pI.setOperationQuantity(pI.getFinalQuantity() - pI.getInitialQuantity());
-            pI.setProduct(product);
-
-            productInventoryService.save(pI);
-
-        }
-    }
-
- */
     @GetMapping("/inactive")
     public String showInactive(Model model, HttpSession session){
 

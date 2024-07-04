@@ -23,6 +23,9 @@ public class ProductInventory {
         this.finalQuantity = finalQuantity;
     }
 
+    public ProductInventory(int id, Product product, int price, int quantity)    {
+    }
+
     public Integer getId() {
         return id;
     }
