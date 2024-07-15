@@ -1,6 +1,10 @@
 package com.ecommerce.ecommerce.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Type;
+
+
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -17,7 +21,7 @@ public class Product {
         this.image = image;
         this.price = price;
         this.quantity = quantity;
-        this.user = user;
+        this.user = user;;
     }
 
     @Override
@@ -29,6 +33,8 @@ public class Product {
                 ", image='" + image + '\'' +
                 ", price=" + price +
                 ", quantity=" + quantity +
+                ", active=" + active +
+                ", user=" + user +
                 '}';
     }
 
@@ -88,6 +94,22 @@ public class Product {
         this.user = user;
     }
 
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public List<ProductInventory> getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(List<ProductInventory> inventory) {
+        this.inventory = inventory;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -96,7 +118,11 @@ public class Product {
     private String image;
     private double price;
     private int quantity;
+    @Convert(converter = org.hibernate.type.YesNoConverter.class)
+    private Boolean active = true;
     @ManyToOne
     private User user;
+    @OneToMany(mappedBy = "product")
+    private List<ProductInventory> inventory;
 
 }

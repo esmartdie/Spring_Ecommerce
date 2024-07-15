@@ -13,6 +13,9 @@ import java.util.Optional;
 @Service
 public class OrderServiceImpl implements IOrderService{
 
+    @Autowired
+    private IOrderRepository orderRepository;
+
     @Override
     public Order save(Order order) {
         return orderRepository.save(order);
@@ -62,6 +65,5 @@ public class OrderServiceImpl implements IOrderService{
         return orderRepository.findByNumber(number);
     }
 
-    @Autowired
-    private IOrderRepository orderRepository;
+
 }

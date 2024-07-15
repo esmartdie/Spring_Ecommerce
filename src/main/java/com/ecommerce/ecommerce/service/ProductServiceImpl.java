@@ -10,33 +10,43 @@ import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements IProductService {
+
+
+    @Autowired
+    private IProductRepository productRepository;
     @Override
     public Product save(Product product) {
-        return IProductRepository.save(product);
+        return productRepository.save(product);
     }
 
     @Override
     public Optional<Product> getProduct(Integer id) {
-        return IProductRepository.findById(id);
+        return productRepository.findById(id);
     }
 
     @Override
     public void update(Product product) {
-        IProductRepository.save(product);
+        productRepository.save(product);
     }
 
     @Override
     public void delete(Integer id) {
-        IProductRepository.deleteById(id);
+        productRepository.deleteById(id);
     }
 
     @Override
     public List<Product> findAll() {
-        return IProductRepository.findAll();
+        return productRepository.findAll();
     }
 
+    @Override
+    public List<Product> findAllInactiveProducts() {
+        return productRepository.findAllInactiveProducts();
+    }
 
-    @Autowired
-    private IProductRepository IProductRepository;
+    @Override
+    public List<Product> findAllActiveProducts() {
+        return productRepository.findAllActiveProducts();
+    }
 
 }

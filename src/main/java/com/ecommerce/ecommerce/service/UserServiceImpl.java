@@ -2,6 +2,7 @@ package com.ecommerce.ecommerce.service;
 
 import com.ecommerce.ecommerce.model.User;
 import com.ecommerce.ecommerce.repository.IUserRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +30,6 @@ public class UserServiceImpl implements IUserService{
     public List<User> findAll() {
         return userRepository.findAll();
     }
-
 
     @Autowired
     private IUserRepository userRepository;

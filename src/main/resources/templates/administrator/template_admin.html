@@ -5,9 +5,9 @@
         <a class="navbar-brand" th:href="@{/administrator}">Spring eCommerce</a>
 
         <form class="form-inline my-2 my-lg-0" method="post"
-              action="#">
+              th:action="@{/administrator/search}">
           <input class="form-control mr-sm-2" type="search"
-                 placeholder="Buscar" aria-label="Search" name="nombre"
+                 placeholder="Search" aria-label="Search" name="productName"
                  autocomplete="off">
           <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
         </form>
@@ -36,11 +36,12 @@
   </div>
 
     <!-- Footer -->
-  <div th:fragment="footer">
+<div th:fragment="footer" >
+  <footer class="py-5 bg-dark">
     <footer class="py-5 bg-dark">
       <div class="container">
         <p class="m-0 text-center text-white">Copyright &copy; Spring eCommerce 2024</p>
       </div>
       <!-- /.container -->
     </footer>
-  </div>
+</div>
