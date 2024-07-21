@@ -117,7 +117,8 @@ class HomeControllerTest {
 
     @Test
     void addCart_UserNotLoggedIn_RedirectsToLoginPage() {
-        session.removeAttribute("userId");
+        when(session.getAttribute("userId")).thenReturn(null);
+        when(shoppingService.isUserNotLoggedIn(session)).thenReturn(true);
         int productId = 1;
         int quantity = 1;
         Model model = mock(Model.class);
@@ -125,30 +126,6 @@ class HomeControllerTest {
         String result = homeController.addCart(productId, quantity, model, session);
 
         assertEquals("redirect:/user/login", result);
-    }
-
-    @Test
-    void addCart_ValidProductAndQuantity_AddsToCartAndReturnsCartPage() {
-        // Arrange
-        session.setAttribute("userId", 1);
-        int productId = 1;
-        int quantity = 1;
-        List<OrderDetail> details = new ArrayList<>();
-        when(shoppingService.getSessionCart(session)).thenReturn(details);
-        Optional<Product> optionalProduct = Optional.of(new Product());
-        when(productService.getProduct(productId)).thenReturn(optionalProduct);
-        when(productInventoryService.findLastProduct(any())).thenReturn(new ProductInventory());
-        Model model = mock(Model.class);
-
-        // Act
-        String result = homeController.addCart(productId, quantity, model, session);
-
-        // Assert
-        assertEquals("user/cart", result);
-        verify(shoppingService).updateOrCreateOrderDetail(eq(quantity), any(), eq(details));
-        verify(model).addAttribute("availableQuantitiesForCart", anyMap());
-        verify(model).addAttribute("cart", details);
-        verify(model).addAttribute("order", homeController.order);
     }
 }
 

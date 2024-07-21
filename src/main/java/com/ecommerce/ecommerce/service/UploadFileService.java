@@ -23,12 +23,11 @@ public class UploadFileService {
         return "default.jpg";
     }
 
-    public void deleteImage(String imageName){
-        String path = "images//";
-        File file = new File(path + imageName);
+    public void deleteImage(String imageName) {
+        File file = new File(folder + imageName);
         file.delete();
     }
 
-    private String folder="images//";
+    private String folder="/app/images/";
 
 }

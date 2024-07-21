@@ -80,16 +80,19 @@ class ShoppingServiceTest {
         product.setPrice(10.0);
         product.setQuantity(20);
 
-        when(productInventoryService.findLastProduct(product)).thenReturn(new ProductInventory(1, product, 20, 0));
+        ProductInventory productInventory = new ProductInventory();
+        productInventory.setFinalQuantity(20);
+
+        when(productInventoryService.findLastProduct(product)).thenReturn(productInventory);
 
         Integer result = shoppingService.getAvailableQuantity(product);
 
+        assertNotNull(result);
         assertEquals(20, result);
     }
 
     @Test
     void updateOrCreateOrderDetail_ExistingOrderDetailExists_UpdatesDetail() {
-        // Arrange
         Product product = new Product();
         product.setId(1);
         product.setName("Product 1");
@@ -101,27 +104,22 @@ class ShoppingServiceTest {
         existingOrderDetail.setTotal(20.0);
         List<OrderDetail> details = new ArrayList<>(Arrays.asList(existingOrderDetail));
 
-        // Act
         shoppingService.updateOrCreateOrderDetail(3, product, details);
 
-        // Assert
         assertEquals(5, existingOrderDetail.getQuantity());
         assertEquals(50.0, existingOrderDetail.getTotal());
     }
 
     @Test
     void updateOrCreateOrderDetail_ExistingOrderDetailDoesNotExist_CreatesNewDetail() {
-        // Arrange
         Product product = new Product();
         product.setId(1);
         product.setName("Product 1");
         product.setPrice(10.0);
         List<OrderDetail> details = new ArrayList<>();
 
-        // Act
         shoppingService.updateOrCreateOrderDetail(3, product, details);
 
-        // Assert
         assertEquals(1, details.size());
         OrderDetail orderDetail = details.get(0);
         assertEquals(product, orderDetail.getProduct());
@@ -131,7 +129,6 @@ class ShoppingServiceTest {
 
     @Test
     void getAvailableQuantitiesForCart_CartWithMultipleProducts_ReturnsQuantitiesMap() {
-        // Arrange
         Product product1 = new Product();
         product1.setId(1);
         product1.setName("Product 1");
@@ -150,13 +147,16 @@ class ShoppingServiceTest {
         detail2.setProduct(product2);
         details.add(detail2);
 
-        when(productInventoryService.findLastProduct(product1)).thenReturn(new ProductInventory(1, product1, 20, 0));
-        when(productInventoryService.findLastProduct(product2)).thenReturn(new ProductInventory(2, product2, 15, 0));
+        ProductInventory inventory1 = new ProductInventory();
+        inventory1.setFinalQuantity(20);
+        when(productInventoryService.findLastProduct(product1)).thenReturn(inventory1);
 
-        // Act
+        ProductInventory inventory2 = new ProductInventory();
+        inventory2.setFinalQuantity(15);
+        when(productInventoryService.findLastProduct(product2)).thenReturn(inventory2);
+
         Map<Integer, Integer> result = shoppingService.getAvailableQuantitiesForCart(details);
 
-        // Assert
         assertEquals(2, result.size());
         assertEquals(20, result.get(1));
         assertEquals(15, result.get(2));
@@ -164,70 +164,71 @@ class ShoppingServiceTest {
 
     @Test
     void calculateTotalSum_CartWithMultipleProducts_ReturnsTotalSum() {
-        // Arrange
         OrderDetail detail1 = new OrderDetail();
         detail1.setPrice(10.0);
         detail1.setQuantity(2);
+        detail1.setTotal(10.0 * 2);
+
         OrderDetail detail2 = new OrderDetail();
         detail2.setPrice(20.0);
         detail2.setQuantity(3);
+        detail2.setTotal(20.0 * 3);
+
         List<OrderDetail> details = Arrays.asList(detail1, detail2);
 
-        // Act
         double result = shoppingService.calculateTotalSum(details);
 
-        // Assert
         assertEquals(80.0, result);
     }
 
     @Test
     void removeProductFromCart_ProductExists_RemovesProductFromCart() {
-        // Arrange
-        Product product = new Product();
-        product.setId(1);
-        product.setName("Product 1");
-        product.setPrice(10.0);
+        Product product1 = new Product();
+        product1.setId(1);
+        product1.setName("Product 1");
+        product1.setPrice(10.0);
+
         OrderDetail detail1 = new OrderDetail();
-        detail1.setProduct(product);
+        detail1.setProduct(product1);
+
+        Product product2 = new Product();
+        product2.setId(2);
+        product2.setName("Product 2");
+        product2.setPrice(20.0);
+
         OrderDetail detail2 = new OrderDetail();
-        detail2.setProduct(new Product());
+        detail2.setProduct(product2);
+
         List<OrderDetail> details = new ArrayList<>(Arrays.asList(detail1, detail2));
 
-        // Act
         shoppingService.removeProductFromCart(1, details);
 
-        // Assert
         assertEquals(1, details.size());
-        assertNotEquals(product, details.get(0).getProduct());
+
+        assertNotEquals(product1, details.get(0).getProduct());
+        assertEquals(product2, details.get(0).getProduct());
     }
 
     @Test
     void redirectToCartOrHomePage_CartNotEmpty_ReturnsCartPage() {
-        // Arrange
         List<OrderDetail> details = Arrays.asList(new OrderDetail(), new OrderDetail());
 
-        // Act
         String result = shoppingService.redirectToCartOrHomePage(details);
 
-        // Assert
         assertEquals("user/cart", result);
     }
 
     @Test
     void redirectToCartOrHomePage_CartEmpty_ReturnsHomePage() {
-        // Arrange
         List<OrderDetail> details = new ArrayList<>();
 
-        // Act
         String result = shoppingService.redirectToCartOrHomePage(details);
 
-        // Assert
         assertEquals("redirect:/getCart", result);
     }
 
     @Test
     void updateCartQuantities_ValidQuantities_UpdatesCartQuantities() {
-        // Arrange
         Product product1 = new Product();
         product1.setId(1);
         product1.setName("Product 1");
@@ -252,10 +253,8 @@ class ShoppingServiceTest {
         quantitiesMap.add("quantities-1", "3");
         quantitiesMap.add("quantities-2", "2");
 
-        // Act
         shoppingService.updateCartQuantities(quantitiesMap, Arrays.asList(1, 2), cart);
 
-        // Assert
         assertEquals(3, detail1.getQuantity());
         assertEquals(30.0, detail1.getTotal());
         assertEquals(2, detail2.getQuantity());
@@ -264,31 +263,32 @@ class ShoppingServiceTest {
 
     @Test
     void updateOrderTotal_CalculatesTotalSumCorrectly() {
-        // Arrange
         Product product1 = new Product();
         product1.setId(1);
         product1.setName("Product 1");
         product1.setPrice(10.0);
+
         OrderDetail detail1 = new OrderDetail();
         detail1.setProduct(product1);
         detail1.setPrice(10.0);
         detail1.setQuantity(2);
+        detail1.setTotal(10.0 * 2);
 
         Product product2 = new Product();
         product2.setId(2);
         product2.setName("Product 2");
         product2.setPrice(20.0);
+
         OrderDetail detail2 = new OrderDetail();
         detail2.setProduct(product2);
         detail2.setPrice(20.0);
         detail2.setQuantity(3);
+        detail2.setTotal(20.0 * 3);
 
         List<OrderDetail> cart = Arrays.asList(detail1, detail2);
 
-        // Act
         double result = shoppingService.updateOrderTotal(null, cart);
 
-        // Assert
-        assertEquals(100.0, result);
+        assertEquals(80.0, result);
     }
 }

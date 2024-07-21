@@ -29,6 +29,7 @@ services:
     volumes:
       - ./src/main/resources/templates:/app/templates
       - ./src/main/resources/static:/app/static
+      - ./images:/app/images
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/ecommerce
       SPRING_DATASOURCE_USERNAME: root

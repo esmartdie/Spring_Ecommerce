@@ -88,7 +88,7 @@ public class HomeController {
 
         Optional<Product> optionalProduct = productService.getProduct(id);
         if (optionalProduct.isEmpty()) {
-            return "redirect:/producthome/" + id;
+            return "redirect:/";
         }
 
         Product product = optionalProduct.get();
